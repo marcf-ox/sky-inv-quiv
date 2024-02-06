@@ -4,7 +4,7 @@ import copy
 import matplotlib.pyplot as plt
 from scipy import stats
 #import mainHN as main
-
+#aezaeaz
 
 
 V=aux.random_grid_indec([5,5], 4)
