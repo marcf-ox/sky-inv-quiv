@@ -344,7 +344,7 @@ print("success: ",int(100* success_fail[1]/sum(success_fail)),"%")
 field=Field.Field("Q")
 xmax=[10,10]
 
-for k in range(100):
+for k in range(10):
     print("k=",k)
     x_set=[(0,0)]
     V= aux.random_grid_indec(xmax, 4,4, 2)
