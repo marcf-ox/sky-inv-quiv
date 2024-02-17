@@ -86,6 +86,7 @@ def computeHN_sub(V,x,filtration=False,verbose=False):    # assumes V=<V_x>
                     v_notx_s_minus= (v_notx*v_x_small)//v_x
                     v_x_disc_minus = v_x*(    v_notx_s_minus*subrep0.spaces[x]- v_x_small*(np.sum(dims_subrep0) -subrep0.spaces[x]))
 
+                    print("dims Us",U0.shape[1],U0_temp.shape[1], v_x)
                     #compute list of possible ux, u_notx
                     better_U_possible = False
                     for ux in range(U0.shape[1]+1,U0_temp.shape[1]):
@@ -343,15 +344,15 @@ print("success: ",int(100* success_fail[1]/sum(success_fail)),"%")
 field=Field.Field("Q")
 xmax=[10,10]
 
-for k in range(2):
+for k in range(100):
     print("k=",k)
     x_set=[(0,0)]
-    V= aux.random_grid_indec(xmax, 3, 5, 2)
+    V= aux.random_grid_indec(xmax, 4,4, 2)
     #x_set=[0]
     #V= aux.star_quiver(5, 8, 3)
     
     V=random_change_bases(V)
-    V.display_graph("V")
+    #V.display_graph("V")
     
     
     HN=computeHN(V,x_set)
