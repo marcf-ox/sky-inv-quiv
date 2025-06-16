@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # My Workspace
 
 This project is a TypeScript-based application designed to demonstrate the configuration and usage of a workspace in a development environment.
@@ -49,3 +50,7 @@ After setting up the project, you can modify the `src/index.ts` file to implemen
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a pull request or open an issue for any suggestions or improvements.
+=======
+# HNcode
+12
+>>>>>>> main

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #%%
 import numpy as np
 import auxHN as aux
@@ -29,6 +30,25 @@ field=field.Field('F_2')
 
 V1,supp1= aux.int_module_in_grid_quiver( [3,3], [(0,0)],[(2,0),(0,2),(1,1)],field)
 V2,supp2= aux.int_module_in_grid_quiver( [3,3], [(0,0)],[(1,0),(0,1)],field)
+=======
+import numpy as np
+import auxHN as aux
+import copy
+import matplotlib.pyplot as plt
+from scipy import stats
+#import mainHN as main
+#aezaeaz
+
+
+V=aux.random_grid_indec([5,5], 4)
+
+#V.display_graph("V")
+
+'''
+
+V1,supp1= aux.int_module_in_grid_quiver( [2,2], [(0,0)],[(1,1)],field)
+V2,supp2= aux.int_module_in_grid_quiver( [2,2], [(0,0)],[(1,0),(0,1)],field)
+>>>>>>> main
 
 x=(0,0)
 
@@ -42,8 +62,13 @@ W.display_graph("1_x")
 
 HNW=main.computeHN_sub(W,(0,0),verbose=True)
 
+<<<<<<< HEAD
 print("test:",HNW)
 
 plt.show()
 
 # %%
+=======
+print(HNW)
+'''
+>>>>>>> main
