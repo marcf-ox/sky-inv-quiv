@@ -31,8 +31,14 @@ def computeHN_sub(V,x,filtration=False,verbose=False):    # assumes V=<V_x>
     
     v_x=V.spaces[x]
     v_notx=sum(list(V.spaces.values()))-v_x
+<<<<<<< HEAD
+    #print("v_x=",v_x,"v_notx=",v_notx,"l",list(V.spaces.values()))
+    U0=None
+    for v_x_small in range(int(min(np.ceil(v_x/float(v_notx)),v_x)),30+2*max(2,v_x+1)):
+=======
     U0=None
     for v_x_small in range(int(min(np.ceil(v_x/float(v_notx)),v_x)),max(2,v_x+1)):
+>>>>>>> main
         U0=None
         blocks_list= cshrunk.buildblock(maps_span_l,d,v_x_small)
         try:  
@@ -41,6 +47,20 @@ def computeHN_sub(V,x,filtration=False,verbose=False):    # assumes V=<V_x>
                 size_X= sum([s[0] for s in blocks_size[:,0]]), sum([s[1] for s in blocks_size[0]])
                 M= np.block([[np.eye(min(blocks.shape)),np.zeros((min(blocks.shape), blocks.shape[1]-min(blocks.shape)))],
                              [np.random.randint(1,25*max(size_X) +10, size=(blocks.shape[0]-min(blocks.shape), min(blocks.shape))),  np.zeros( (blocks.shape[0]-min(blocks.shape),  blocks.shape[1]-min(blocks.shape))) ]])
+<<<<<<< HEAD
+                M=field.to_Field(np.array(M,dtype="i"))
+                X= (M,maps_span_l, blocks) 
+                A=cshrunk.assemble_block(X)
+                if v_x_small>10 and (n & (n - 1)) == 0:
+                    print(blocks.shape,"t",aux.extract_basis(A,field).shape[1],aux.extract_basis(A,field).shape[1] *5 / blocks.shape[0]  )          
+                try:
+                    t=time()
+                    U0_temp=cshrunk.wongblockpseudo(X,field=field)
+                    t1=time()
+                    '''
+                    U0p=aux.extract_basis(cshrunk.wongblock(X)[:v_x],field)
+                    print(U0_temp.shape,U0p.shape,"e")
+=======
                 M=field.one*np.array(M,dtype="i")
                 X= (M,maps_span_l, blocks)            
                 try:
@@ -49,6 +69,7 @@ def computeHN_sub(V,x,filtration=False,verbose=False):    # assumes V=<V_x>
                     t1=time()
                     '''
                     U0p=aux.extract_basis(cshrunk.wongblock(X)[:v_x],field)
+>>>>>>> main
                     t2=time()
                     if t1-t>100:
                         print("new", np.round(t1-t,2)," s, old",np.round(t2-t1,2)," s")
@@ -59,9 +80,16 @@ def computeHN_sub(V,x,filtration=False,verbose=False):    # assumes V=<V_x>
                     if str(e) =="nc-rk A<nc-rk B":
                         M= np.block([[np.eye(min(blocks.shape)),np.zeros((min(blocks.shape), blocks.shape[1]-min(blocks.shape)))],
                                     [np.random.randint(1,25*max(size_X) +10, size=(blocks.shape[0]-min(blocks.shape), min(blocks.shape))),  np.zeros( (blocks.shape[0]-min(blocks.shape),  blocks.shape[1]-min(blocks.shape))) ]])
+<<<<<<< HEAD
+                        M=field.to_Field(np.array(M,dtype="i"))
+                        X= (M,maps_span_l, blocks)
+                        Ap=cshrunk.assemble_block(X)
+                        U0_temp=cshrunk.wongblockpseudo(X,field=field)
+=======
                         M=field.one*np.array(M,dtype="i")
                         X= (M,maps_span_l, blocks)
                         U0_temp=cshrunk.wongblockpseudo(X)
+>>>>>>> main
                     else: 
                         raise 
                 if not( U0 is None or aux.intersection(U0,U0_temp,field).shape[1]==max(U0.shape[1] ,U0_temp.shape[1]) ) :
@@ -85,8 +113,11 @@ def computeHN_sub(V,x,filtration=False,verbose=False):    # assumes V=<V_x>
                     c_moins= (v_notx+v_x)*subrep0.spaces[x]- v_x*np.sum(dims_subrep0)
                     v_notx_s_minus= (v_notx*v_x_small)//v_x
                     v_x_disc_minus = v_x*(    v_notx_s_minus*subrep0.spaces[x]- v_x_small*(np.sum(dims_subrep0) -subrep0.spaces[x]))
+<<<<<<< HEAD
+=======
 
                     print("dims Us",U0.shape[1],U0_temp.shape[1], v_x)
+>>>>>>> main
                     #compute list of possible ux, u_notx
                     better_U_possible = False
                     for ux in range(U0.shape[1]+1,U0_temp.shape[1]):
@@ -103,6 +134,13 @@ def computeHN_sub(V,x,filtration=False,verbose=False):    # assumes V=<V_x>
 
                         #print("ux",ux,",",u_notx_min,u_notx_max,",",v_x_small)
                         better_U_possible |=  u_notx_max >= u_notx_min
+<<<<<<< HEAD
+                    #raise error if bound disc< floor(disc+) not good enough
+                    if better_U_possible:
+                        raise ValueError("weight approx incorrect")
+                    if c_plus<c_moins:
+                        U_temp=U0
+=======
 
                     #assert(c_plus>=c_moins)
                     if better_U_possible:
@@ -131,14 +169,24 @@ def computeHN_sub(V,x,filtration=False,verbose=False):    # assumes V=<V_x>
                     if v_x>2:
                         pass#print("c+=",c_plus," /\ ","disc+=", disc_plus,"c+_app=",c_plus_app, "v_x_small=",v_x_small, end =" ")
                     #print("ux=",U0_temp.shape[1],"v_x_small",v_x_small, "v_s_notx=", (v_notx*v_x_small)//v_x    +1     , "v_x=",v_x,"v_notx=",v_notx)
+>>>>>>> main
                 U0=U0_temp
             break
         except ValueError as e:
             if str(e) =="weight approx incorrect":
+<<<<<<< HEAD
+                if v_x>2 and v_x_small>0 and verbose:
+                    print("weigt err:",v_x_small,v_x)
+            elif str(e)== "nc-rk A<nc-rk B":
+                print("blow-up err:",v_x_small,v_x)
+                if v_x_small>v_x:
+                    pass
+=======
                 if v_x>2 and v_x_small>0:
                     print("weigt err:",v_x_small,v_x)
             elif str(e)== "nc-rk A<nc-rk B":
                 print("blow-up err:",v_x_small,v_x)
+>>>>>>> main
             else: 
                 raise 
 
@@ -166,7 +214,18 @@ def computeHN_sub(V,x,filtration=False,verbose=False):    # assumes V=<V_x>
         if verbose:
             print("qrep",sum(quotrep.spaces.values()))
         if not(quotrep.is_zero()):
+<<<<<<< HEAD
+            try:
+                l=l+ [dims_subrep+ dims_quot for dims_quot in computeHN_sub(quotrep,x,filtration,verbose)]
+            except ValueError as e:
+                V.display_graph("V")
+                subrep.display_graph("U")
+                quotrep.display_graph("V/U")
+                print('V', V.spaces.values(),'subrep', subrep.spaces.values(), 'quotrep', quotrep.spaces.values())
+                raise
+=======
             l=l+ [dims_subrep+ dims_quot for dims_quot in computeHN_sub(quotrep,x,filtration,verbose)]
+>>>>>>> main
     return l
     
 def computeHN(V,x_set=False,filtration=False,verbose=False): 
@@ -179,7 +238,16 @@ def computeHN(V,x_set=False,filtration=False,verbose=False):
         else:
             span_maps= aux.spanning_subrep(V, x,  V.field.to_Field(np.eye(V.spaces[x])))
             span_subrep= aux.subrep(V,span_maps)
+<<<<<<< HEAD
+            try:
+                l=computeHN_sub(span_subrep,x,filtration,verbose)
+            except ValueError as e:
+                V.display_graph("V2")
+                span_subrep.display_graph("U2")
+                raise
+=======
             l=computeHN_sub(span_subrep,x,filtration,verbose)
+>>>>>>> main
             V.display_graph("V",verbose)
             skyscraper[x]= [np.zeros(len(V.vertices),dtype="i")]+l+[np.array(list(span_subrep.spaces.values()))]
             if sum(list(span_subrep.spaces.values()))<sum(list(V.spaces.values())):
@@ -200,10 +268,24 @@ def build_spanning_maps(V,x):
                 try:
                     assert(Field.is_all_zero_mat(maps_span[V.edges[e][1]]-np.dot( V.Ve[e], maps_span[V.edges[e][0]]), field))
                 except:
+<<<<<<< HEAD
+                    V.display_graph("V")
+                    print(x)
+                    print("r",V.edges[e],maps_span[V.edges[e][1]],np.dot( V.Ve[e], maps_span[V.edges[e][0]]), field)
+                    raise
+            else: 
+                file.append(V.edges[e][1])
+                try:
+                    maps_span[V.edges[e][1]]=np.dot( V.Ve[e], maps_span[V.edges[e][0]])
+                except:
+                    print("e",V.Ve[e], maps_span[V.edges[e][0]])
+                    raise ValueError("error in map "+str(e)+" from "+str(V.edges[e][0])+" to "+str(V.edges[e][1]))
+=======
                     print("r",V.edges[e],maps_span[V.edges[e][1]],np.dot( V.Ve[e], maps_span[V.edges[e][0]]), field)
             else: 
                 file.append(V.edges[e][1])
                 maps_span[V.edges[e][1]]=np.dot( V.Ve[e], maps_span[V.edges[e][0]])
+>>>>>>> main
     return maps_span
 
 
@@ -214,6 +296,18 @@ def random_change_bases(V):
             P[x]=V.field.to_Field(np.ones((0, 0)))
         else:
             p= np.random.randint(1,20,(V.spaces[x],V.spaces[x]))
+<<<<<<< HEAD
+            while (V.field.descr in ['Q','R','C'] and
+                    not scipy.linalg.orth(p,rcond=epsilon).shape[1]==V.spaces[x]) or \
+                    (V.field.descr not in ['Q','R','C'] and aux.extract_basis(V.field.to_Field(p),V.field).shape[1]!=V.spaces[x]):
+                p= np.random.randint(1,20,(V.spaces[x],V.spaces[x]))
+            P[x]=V.field.to_Field(p)
+    return aux.bases_change(V,P)
+    
+def test_skyscraper(grid_size,n_int,verbose=False,field=Field.Field("Q") ):
+    
+    
+=======
             porth=scipy.linalg.orth(p,rcond=epsilon)
             while porth.shape[1]!=porth.shape[0]:
                 p= np.random.randint(1,20,(V.spaces[x],V.spaces[x]))
@@ -224,6 +318,7 @@ def random_change_bases(V):
 def test_skyscraper(grid_size,n_int,verbose=False ):
     
     field=Field.Field("Q")
+>>>>>>> main
     V,_=aux.int_module_in_grid_quiver(grid_size, [(1,1)], [(0,0)],field)
     list_V=[]
     if n_int>2:
@@ -325,6 +420,34 @@ def HN_everywhere_ss(V,x):
         card= np.sum(dim_intersect)/float(V.spaces[x])
         return {card:  dim_intersect} 
 
+<<<<<<< HEAD
+
+field=Field.Field("F_2")
+n=5
+xmax=[n,n]
+t= time()
+success_fail=[0,0]
+#start_test=np.random.randint(0,10000)
+start_test = 154540+60#
+n_test=10
+print("random seed=",start_test)
+for k in range(0,n_test):
+    np.random.seed(start_test+k)
+    print("k=",k)
+
+    success_fail[test_skyscraper(xmax,n,False,field)]+=1
+
+print(np.round((time()-t)/n_test,2),"s")
+print("success: ",int(100* success_fail[1]/sum(success_fail)),"%")
+
+
+'''
+
+for k in range(10):
+    print("k=",k)
+    x_set=[(0,0)]
+    V= aux.random_grid_indec(xmax, 4,3, 2)
+=======
 '''
 t= time()
 success_fail=[0,0]
@@ -348,6 +471,7 @@ for k in range(10):
     print("k=",k)
     x_set=[(0,0)]
     V= aux.random_grid_indec(xmax, 4,4, 2)
+>>>>>>> main
     #x_set=[0]
     #V= aux.star_quiver(5, 8, 3)
     
@@ -360,7 +484,10 @@ for k in range(10):
     aux.compute_quotient_slopes(HN, x_set, V.vertices)
     #print(len(HN[(0,0)]))
     print("len=",len(HN[x_set[0]]))
+<<<<<<< HEAD
+=======
 '''
+>>>>>>> main
 
 V1,supp1= aux.int_module_in_grid_quiver( xmax, [(0,0)],[(0,2),(1,1)],field)
 V2,supp2= aux.int_module_in_grid_quiver( xmax, [(0,0)],[(2,1),(1,2)],field)
@@ -379,6 +506,10 @@ print("computing from HN:")
 print(HN2[(0,0)])
 print("computing from supports:")
 print(HN1[(0,0)])
+<<<<<<< HEAD
+'''
+=======
 '''
 
 
+>>>>>>> main
