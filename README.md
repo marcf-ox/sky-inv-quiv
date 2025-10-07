@@ -1,56 +1,18 @@
-<<<<<<< HEAD
-# My Workspace
+<section>
+  <h2>Summary</h2>
+   This package implements in Python an algorithm to compute the skyscaper invariant [2] over a finite grid poset. This algorithm relies on the ideas described in [1]. 
+</section>
 
-This project is a TypeScript-based application designed to demonstrate the configuration and usage of a workspace in a development environment.
-
-## Project Structure
-
-```
-my-workspace
-├── src
-│   └── index.ts        # Entry point of the application
-├── .vscode
-│   └── settings.json   # Workspace-specific settings
-├── package.json        # npm configuration file
-├── tsconfig.json       # TypeScript configuration file
-└── README.md           # Project documentation
-```
-
-## Setup Instructions
-
-1. Clone the repository:
-   ```
-   git clone <repository-url>
-   ```
-
-2. Navigate to the project directory:
-   ```
-   cd my-workspace
-   ```
-
-3. Install the dependencies:
-   ```
-   npm install
-   ```
-
-4. Compile the TypeScript files:
-   ```
-   npm run build
-   ```
-
-5. Run the application:
-   ```
-   npm start
-   ```
-
-## Usage
-
-After setting up the project, you can modify the `src/index.ts` file to implement your application logic. The workspace is configured to support TypeScript development, and you can customize the settings in the `.vscode/settings.json` file as needed.
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a pull request or open an issue for any suggestions or improvements.
-=======
-# HNcode
-12
->>>>>>> main
+<section>
+  <h2>References</h2>
+  <ol>
+    <li>
+      Cheng, Chi-Yu. (2024). <cite>A deterministic algorithm for Harder–Narasimhan filtrations for representations of acyclic quivers</cite>. <em>Algebra & Number Theory</em>, <strong>18</strong>(2), 319–347. 
+      <a href="https://doi.org/10.2140/ant.2024.18.319" target="_blank" rel="noopener">https://doi.org/10.2140/ant.2024.18.319</a>
+    </li>
+    <li>
+      Fersztand, Marc, Jacquard, Emile, Nanda, Vidit, & Tillmann, Ulrike. (2024). <cite>Harder–Narasimhan filtrations of persistence modules</cite>. <em>Transactions of the London Mathematical Society</em>, <strong>11</strong>(1), e70003. 
+      <a href="https://doi.org/10.1112/tlm3.70003" target="_blank" rel="noopener">https://doi.org/10.1112/tlm3.70003</a>
+    </li>
+  </ol>
+</section>
