@@ -23,6 +23,10 @@ plt.show()
 
 
 '''
+
+
+
+
 field=field.Field('F_2')
 
 
@@ -37,10 +41,12 @@ V3=aux.ind_vertex(V1.vertices,V1.edges,x,field)
 W= aux.direct_sum(aux.direct_sum(V1,V2),V3)
 
 
-W.display_graph("1_x")
 
 
-HNW=main.computeHN_sub(W,(0,0),verbose=True)
+W.display_graph("1_x",verbose=False)
+
+
+HNW=main.computeHN_sub(W,(0,0),verbose=False)
 
 print("test:",HNW)
 
