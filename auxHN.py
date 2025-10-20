@@ -163,12 +163,8 @@ def quotientrep(V,Wx):
     
 
 # Row echelon form (Gaussion pivot)
-<<<<<<< HEAD
 def row_echelon(M_input,field, max_col= None,track_swaps=False): 
     swaps=np.arange(M_input.shape[0])
-=======
-def row_echelon(M_input,field, max_col= None): 
->>>>>>> main
     if max_col is None:
         max_col=M_input.shape[1]
     M= Field.flatten_zero(copy.deepcopy(M_input),field)
@@ -181,11 +177,7 @@ def row_echelon(M_input,field, max_col= None):
     pivots=[]
     #create one new echelon
     def echelonify(next_pivot_row, col):
-<<<<<<< HEAD
         #choose best row to pivot)
-=======
-        #choose best row to pivot
->>>>>>> main
         if (field.descr in ['Q','R','C']) :
             best_row= next_pivot_row+np.argmax(np.abs(M[next_pivot_row:,col]))
         else:
@@ -201,10 +193,7 @@ def row_echelon(M_input,field, max_col= None):
             M[best_row]=rw
             rw=np.copy(M[next_pivot_row,col:])
             pivots.append(col)
-<<<<<<< HEAD
             swaps[next_pivot_row],swaps[best_row]=swaps[best_row],swaps[next_pivot_row]
-=======
->>>>>>> main
         else: # the column col is null
             return next_pivot_row
         #echelonify the matrix
@@ -229,28 +218,18 @@ def row_echelon(M_input,field, max_col= None):
         rw=np.copy(M[i])
         for j in range(i):
             if not(Field.is_all_zero_elem(M[j][pivots[i]],field)):
-<<<<<<< HEAD
                 M[j] -= rw* M[j][pivots[i]] 
     if track_swaps:
         return np.array(M),pivots,swaps
-=======
-                M[j] -= M[j][pivots[i]] * rw
->>>>>>> main
     return np.array(M),pivots
 
 
 
 
 #put in column echelon form
-<<<<<<< HEAD
 def col_echelon(M,field,max_col=None,track_swaps=False):
     row_ech_tr=row_echelon(np.transpose(M),field,max_col=max_col,track_swaps=track_swaps)
     return np.transpose(row_ech_tr[0]),*row_ech_tr[1:]
-=======
-def col_echelon(M,field,max_col=None):
-    row_ech_tr=row_echelon(np.transpose(M),field,max_col=max_col)
-    return np.transpose(row_ech_tr[0]),row_ech_tr[1]
->>>>>>> main
      
    
 #compute kernel of M
@@ -295,7 +274,6 @@ def complete_basis(M,field):
     if  field.descr in['Q','R','C']:
         return null_space(np.transpose(M), field)
     #TODO not working when column are swapped
-<<<<<<< HEAD
     col_ech,pivots,swaps=col_echelon(np.concatenate((M, field.to_Field(np.eye(M.shape[0]))),axis=1), field,track_swaps=True)
     swaps_inv=np.zeros(len(swaps),dtype="i")
     for i in range(len(swaps)):
@@ -309,11 +287,6 @@ def complete_basis(M,field):
         print(M , "col_ech \n",col_ech,"\n swaps",swaps,"complete_base",complete_base)
         raise ValueError("e3")
     return  complete_base
-=======
-    col_ech,pivots=col_echelon(np.concatenate((M, field.to_Field(np.eye(M.shape[0]))),axis=1), field)
-    non_zero_cols=[not(Field.is_all_zero_mat(col_ech[:,M.shape[1]+i],field))  for i in range(M.shape[0])]
-    return  field.to_Field(np.eye(M.shape[0]))[:,np.array(non_zero_cols)]
->>>>>>> main
 
 def sum_subspaces(U,V,field):
     U=Field.flatten_zero(U,field)
@@ -466,13 +439,8 @@ def bases_change(V,P):
 
 def test_subrep_quotient_rep(field_descr):
     field=Field.Field(field_descr)
-<<<<<<< HEAD
     V1,_= int_module_in_grid_quiver([5,4], [1,1], [3,2],field)
     V2,_= int_module_in_grid_quiver([5,4], [0,1], [3,3],field)
-=======
-    V1= int_module_in_grid_quiver([5,4], [1,1], [3,2],field)
-    V2= int_module_in_grid_quiver([5,4], [0,1], [3,3],field)
->>>>>>> main
     
     
     V=direct_sum(V1, V2)
