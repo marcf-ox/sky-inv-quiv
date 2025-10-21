@@ -1,12 +1,12 @@
 #%%
 import numpy as np
-import auxHN as aux
+import sky_inv_quiv.auxHN as aux
 import copy
 import Field as field
 import matplotlib.pyplot as plt
 from scipy import stats
 from time import sleep
-import mainHN as main
+import sky_inv_quiv.mainHN as main
 #aezaeaz
 
 '''
