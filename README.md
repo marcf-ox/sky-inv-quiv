@@ -4,6 +4,38 @@
 </section>
 
 <section>
+  <h2>
+    Installation
+    It may be installed via
+
+```
+pip install git+https://github.com/marcf-ox/HNcode
+```
+
+This requires Python >=3.8.0, Numpy>=2.4.1, Scipy>=1.10.0, cfractions>=2.4.1, Networkx>=2.6.2, Matplotlib>=3.10.7.
+<\section>
+
+<section>
+  <h2>
+    Example
+  </h2> 
+
+ A detailed Jupyter tutorial notebook is available at:
+
+<a href = https://github.com/marcf-ox/HNcode/notebook/tuto.ipynb> Tutorial notebook </a>
+
+A first example of use of this package is given below:
+
+```
+TODO
+```
+
+
+  </h2>
+</section> 
+
+
+<section>
   <h2>References</h2>
   <ol>
     <li>
