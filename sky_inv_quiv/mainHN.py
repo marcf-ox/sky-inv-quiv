@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import numpy as np
 import scipy as scipy
-import auxHN as aux
-import HNcshrunk as cshrunk
+import sky_inv_quiv.auxHN as aux
+import sky_inv_quiv.HNcshrunk as cshrunk
 from time import time,sleep
 import copy
 from cfractions import Fraction
@@ -10,7 +10,7 @@ epsilon=1e-10
 import warnings
 import traceback
 import matplotlib.pyplot as plt
-import Field
+import sky_inv_quiv.Field
 warnings.simplefilter("error")
 
 
