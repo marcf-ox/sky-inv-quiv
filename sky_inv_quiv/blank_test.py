@@ -1,12 +1,12 @@
 #%%
 import numpy as np
-import sky_inv_quiv.auxHN as aux
+from sky_inv_quiv.auxHN import int_module_in_grid_quiver, direct_sum, ind_vertex
 import copy
-import sky_inv_quiv.Field as field
+from sky_inv_quiv.Field import Field
 import matplotlib.pyplot as plt
 from scipy import stats
 from time import sleep
-import sky_inv_quiv.mainHN as main
+from sky_inv_quiv.mainHN import computeHN, computeHN_sub
 #aezaeaz
 
 '''
@@ -15,7 +15,7 @@ V=aux.random_grid_indec([3,4], 5,3,3)
 V.display_graph("V")
 
 
-HNV=main.computeHN_sub(V,(0,0),verbose=False)
+HNV=computeHN_sub(V,(0,0),verbose=False)
 
 print(HNV)
 plt.show()
@@ -27,18 +27,18 @@ plt.show()
 
 
 
-field=field.Field('F_2')
+field=Field('F_2')
 
 
 
-V1,supp1= aux.int_module_in_grid_quiver( [3,3], [(0,0)],[(2,0),(0,2),(1,1)],field)
-V2,supp2= aux.int_module_in_grid_quiver( [3,3], [(0,0)],[(1,0),(0,1)],field)
+V1,supp1= int_module_in_grid_quiver( [3,3], [(0,0)],[(2,0),(0,2),(1,1)],field)
+V2,supp2= int_module_in_grid_quiver( [3,3], [(0,0)],[(1,0),(0,1)],field)
 
 x=(0,0)
 
-V3=aux.ind_vertex(V1.vertices,V1.edges,x,field)
+V3= ind_vertex(V1.vertices,V1.edges,x,field)
  
-W= aux.direct_sum(aux.direct_sum(V1,V2),V3)
+W= direct_sum(direct_sum(V1,V2),V3)
 
 
 
@@ -46,7 +46,7 @@ W= aux.direct_sum(aux.direct_sum(V1,V2),V3)
 W.display_graph("1_x",verbose=False)
 
 
-HNW=main.computeHN_sub(W,(0,0),verbose=False)
+HNW=computeHN_sub(W,(0,0),verbose=False)
 
 print("test:",HNW)
 
