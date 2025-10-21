@@ -2,7 +2,7 @@
 import numpy as np
 import sky_inv_quiv.auxHN as aux
 import copy
-import Field as field
+import sky_inv_quiv.Field as field
 import matplotlib.pyplot as plt
 from scipy import stats
 from time import sleep
