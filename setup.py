@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-setuptools.setup(
+setup(
     name='HN-filtration',
     version="0.1.0",
     author='Marcf',
