@@ -1,8 +1,8 @@
-import Field
+import sky_inv_quiv.Field
 import numpy as np
 from time import time
 import copy
-import auxHN as aux
+import sky_inv_quiv.auxHN as aux
 from sky_inv_quiv.mainHN import computeHN
 import scipy.linalg
 
