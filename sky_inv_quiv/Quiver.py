@@ -2,12 +2,12 @@ import numpy as np
 from time import time,sleep
 import matplotlib.pyplot as plt
 import networkx as nx
-import sky_inv_quiv.Field as Field
+from sky_inv_quiv.Field import Field
 
 ## QUIVER REP
 #definition
 class Quiver:
-    def __init__(self, vertices, edges,Ve,field=Field.Field('R'),grid=False):
+    def __init__(self, vertices, edges,Ve,field=Field('R'),grid=False):
         self.vertices=vertices#Q0
         self.edges = edges 
         self.Ve=Ve
