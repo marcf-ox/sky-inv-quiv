@@ -6,6 +6,7 @@
 <section>
   <h2>
     Installation
+    <\h2>
     It may be installed via
 
 ```
@@ -29,9 +30,6 @@ A first example of use of this package is given below:
 ```
 TODO
 ```
-
-
-  </h2>
 </section> 
 
 
