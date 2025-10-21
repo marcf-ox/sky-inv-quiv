@@ -1,7 +1,7 @@
 import numpy as np
 import scipy as sc
 import copy as copy
-import sky_inv_quiv.auxHN as aux
+from sky_inv_quiv.auxHN import extract_basis,intersection,inverse_image, row_echelon,col_echelon, ech_to_diag_col, null_space,complete_basis
 from time import time,sleep
 import math
 from sky_inv_quiv.Field import Field, build_block_diag_l, is_all_zero_mat
@@ -25,13 +25,13 @@ def wongblock(X,field=Field("Q")):
         Wold=W
         W_list=[]
         for i in range(len(V)):
-            W_list.append( aux.extract_basis(np.block([ np.matmul(V[i], U[vx*y:vx*(y+1)]) for y in range(len(U)//vx)  ]),field))
+            W_list.append( extract_basis(np.block([ np.matmul(V[i], U[vx*y:vx*(y+1)]) for y in range(len(U)//vx)  ]),field))
         W_list= [ W_list [i%len(V)] for i in range(blocks.shape[0])]
         W= build_block_diag_l(W_list ,field)
-        WcapImA= aux.intersection(W,aux.extract_basis(X_ass,field),field)
+        WcapImA= intersection(W,extract_basis(X_ass,field),field)
         if WcapImA.shape[1]!= W.shape[1]:
             raise ValueError("nc-rk A<nc-rk B")
-        U=aux.inverse_image(X_ass, W, field)    
+        U=inverse_image(X_ass, W, field)    
         
     
     '''
@@ -40,25 +40,25 @@ def wongblock(X,field=Field("Q")):
     
     W1_list=[]
     for i in range(len(V)):
-        W1_list.append( aux.extract_basis(np.block([ np.matmul(V[i], kerA[vx*y:vx*(y+1)]) for y in range(len(kerA)//vx)  ]),field))
+        W1_list.append( extract_basis(np.block([ np.matmul(V[i], kerA[vx*y:vx*(y+1)]) for y in range(len(kerA)//vx)  ]),field))
     W1_list= [ W1_list [i%len(V)] for i in range(blocks.shape[0])]
     W1= build_block_diag_l(W1_list ,field)
     X_ass= assemble_block(X)
-    W1capImA= aux.intersection(W1,aux.extract_basis(X_ass,field),field)
+    W1capImA= intersection(W1,extract_basis(X_ass,field),field)
     if W1capImA.shape[1]!= W1.shape[1]:
         raise ValueError("nc-rk A<nc-rk B")
-    U=aux.inverse_image(X_ass, W1, field)    
+    U=inverse_image(X_ass, W1, field)    
 
     W2_list=[]
     for i in range(len(V)):
-        W2_list.append( aux.extract_basis(np.block([ np.matmul(V[i], U[vx*y:vx*(y+1)]) for y in range(len(U)//vx)  ]),field))
+        W2_list.append( extract_basis(np.block([ np.matmul(V[i], U[vx*y:vx*(y+1)]) for y in range(len(U)//vx)  ]),field))
     W2_list= [ W2_list [i%len(V)] for i in range(blocks.shape[0])]
     W2= build_block_diag_l(W2_list ,field)
     assert (W2.shape[1]== W1.shape[1])
     '''
     
     U0=np.concatenate([U[vx*i:vx*(i+1)] for i in range(0,len(U)//vx) ], axis=1)
-    U0 =aux.extract_basis(U0,field)
+    U0 =extract_basis(U0,field)
     return U0
 
 
@@ -83,13 +83,13 @@ def wongblockpseudo(X,field=Field("Q"),is_M_ech=True):
     #column echelon M
     M_ech , PM= M , field.to_Field(np.eye(M.shape[1]))
     if not(is_M_ech):
-        aug_mat_M=aux.ech_to_diag_col(aux.col_echelon(np.concatenate([M, field.to_Field(np.eye(M.shape[1]))]),field)[0],field)
+        aug_mat_M=ech_to_diag_col(col_echelon(np.concatenate([M, field.to_Field(np.eye(M.shape[1]))]),field)[0],field)
         M_ech , PM = aug_mat_M[:M.shape[0]],aug_mat_M[M.shape[0]:]
     
             #row echelon V
     V_ech_row,PV_row=[],[]
     for Vy in V:   
-        aug_mat=aux.row_echelon(np.concatenate([Vy,  field.to_Field(np.eye(Vy.shape[0]))],axis=1),field)[0]
+        aug_mat=row_echelon(np.concatenate([Vy,  field.to_Field(np.eye(Vy.shape[0]))],axis=1),field)[0]
         Vy_ech,Py = aug_mat[:,:Vy.shape[1]],aug_mat[:,Vy.shape[1]:]
         V_ech_row.append(Vy_ech)
         PV_row.append(Py)
@@ -113,13 +113,13 @@ def wongblockpseudo(X,field=Field("Q"),is_M_ech=True):
 
     #kerA2 = P_col_ech2[:,np.array(is_zero_col2)]
 
-    #assert( aux.intersection(kerA, kerA2,field).shape[1]== max(kerA.shape[1],kerA2.shape[1] ) )
+    #assert( intersection(kerA, kerA2,field).shape[1]== max(kerA.shape[1],kerA2.shape[1] ) )
     #imA = A_col_ech[:, np.logical_not(is_zero_col)  ] 
     
     def W_from_U(U):
         W_list=[]
         for i in range(len(V)):
-            W_list.append( aux.extract_basis(np.block([ np.matmul(V[i], U[vx*y:vx*(y+1)]) for y in range(len(U)//vx)  ]),field))
+            W_list.append( extract_basis(np.block([ np.matmul(V[i], U[vx*y:vx*(y+1)]) for y in range(len(U)//vx)  ]),field))
         W_list=[W_list [i%len(V)].copy() for i in range(blocks.shape[0])]
         return sum([wi.shape[1] for wi in W_list]),build_block_diag_l(W_list ,field)
     
@@ -127,10 +127,10 @@ def wongblockpseudo(X,field=Field("Q"),is_M_ech=True):
     U=kerA
     W_shape,W= W_from_U(kerA)
     '''
-    U0= aux.extract_basis(kerA[:vx],field)
+    U0= extract_basis(kerA[:vx],field)
     W_list=[]
     for i in range(len(V)):
-        W_list.append( aux.extract_basis(np.block([ np.matmul(V[i], kerA[vx*y:vx*(y+1)]) for y in range(len(kerA)//vx)  ]),field))
+        W_list.append( extract_basis(np.block([ np.matmul(V[i], kerA[vx*y:vx*(y+1)]) for y in range(len(kerA)//vx)  ]),field))
     W_list= [ W_list [i%len(V)] for i in range(blocks.shape[0])]
     W_shape1=sum([ W_list [i%len(V)].shape[1] for i in range(blocks.shape[0])])
     '''
@@ -144,7 +144,7 @@ def wongblockpseudo(X,field=Field("Q"),is_M_ech=True):
         if not(is_all_zero_mat(PW[is_zero_row],field)):#check W\subset Im A
             raise ValueError("nc-rk A<nc-rk B")
 
-        U= np.concatenate([aux.inverse_image_vect_from_ech(A_row_ech,pivots_row, PW ,field), kerA],axis=1)    
+        U= np.concatenate([inverse_image_vect_from_ech(A_row_ech,pivots_row, PW ,field), kerA],axis=1)    
         
         W_shape_old=W_shape
         W_shape,W= W_from_U(U)
@@ -152,10 +152,10 @@ def wongblockpseudo(X,field=Field("Q"),is_M_ech=True):
         ind+=1
         '''
         U0=np.concatenate([U[vx*i:vx*(i+1)] for i in range(1,len(U)//vx) ], axis=1)
-        U0 =aux.extract_basis(U0,field)
+        U0 =extract_basis(U0,field)
         
       #Wi+1        
-        W2_list= [aux.extract_basis( np.matmul(Vy, U0),field) for Vy in V]
+        W2_list= [extract_basis( np.matmul(Vy, U0),field) for Vy in V]
         W2_shape1=sum([ W2_list [i%len(V)].shape[1] for i in range(blocks.shape[0])])
         is_W_stab |= (W2_shape1== W.shape[1])
         W_list=W2_list
@@ -172,9 +172,9 @@ def wongblockpseudo(X,field=Field("Q"),is_M_ech=True):
     #check U= U0 \otimes C^n
     U0=np.concatenate([U[vx*i:vx*(i+1)] for i in range(0,len(U)//vx) ], axis=1)
     for i in range(0,len(U)//vx):
-        U0check=aux.extract_basis(U[vx*i:vx*(i+1)],field)
-        assert(aux.intersection(U0,U0check,field).shape[1]==max(U0.shape[1],U0check.shape[1]))
-    U0 =aux.extract_basis(U0,field)   
+        U0check=extract_basis(U[vx*i:vx*(i+1)],field)
+        assert(intersection(U0,U0check,field).shape[1]==max(U0.shape[1],U0check.shape[1]))
+    U0 =extract_basis(U0,field)   
     return U0
 
 
@@ -256,13 +256,13 @@ def buildblock(V,d,v_x_small=1):
 def pseudo_inverse(A):
     t=time()
     field=Field("Q")
-    kerA = aux.null_space(A,field)
-    U=aux.complete_basis(kerA,field)
+    kerA = null_space(A,field)
+    U=complete_basis(kerA,field)
     P=np.concatenate((U,kerA),axis=1)
     ImA=np.matmul(A,U)
-    Up=aux.complete_basis(ImA,field)
+    Up=complete_basis(ImA,field)
     Q=np.concatenate((ImA,Up),axis=1)
-    Ap=np.transpose(aux.inverse_image_vect(np.transpose(Q),np.transpose(P),field))
+    Ap=np.transpose(inverse_image_vect(np.transpose(Q),np.transpose(P),field))
     return Ap
 
 
@@ -275,7 +275,7 @@ def ker_block_Q(X,field=Field("Q")):
     shape_X= ( sum([ V[blocks[i][0] ].shape[0] for i in range(blocks.shape[0]) ])
         ,sum([V[blocks[0][j]].shape[1] for j in range(blocks.shape[1])])  )
         #column echelon M
-    aug_mat=aux.ech_to_diag_col(aux.col_echelon(np.concatenate([M, field.to_Field(np.eye(M.shape[1]))]),field)[0],field)
+    aug_mat=ech_to_diag_col(col_echelon(np.concatenate([M, field.to_Field(np.eye(M.shape[1]))]),field)[0],field)
     M_ech , PM = aug_mat[:M.shape[0]],aug_mat[M.shape[0]:]
     zero_col_top_M=np.where([is_all_zero_mat(M_ech[:,i],field) for i in range(M.shape[1])])[0]
     #print("M_ech=\n",M_ech)
@@ -284,7 +284,7 @@ def ker_block_Q(X,field=Field("Q")):
     V_ech,PV=[],[]
     zero_col_top_V=[]
     for Vy in V:   
-        aug_mat=aux.col_echelon(np.concatenate([Vy, field.to_Field(np.eye(Vy.shape[1]))]),field)[0]
+        aug_mat=col_echelon(np.concatenate([Vy, field.to_Field(np.eye(Vy.shape[1]))]),field)[0]
         Vy_ech,Py = aug_mat[:Vy.shape[0]],aug_mat[Vy.shape[0]:]
         V_ech.append(Vy_ech)
         PV.append(Py)
@@ -337,7 +337,7 @@ def ker_block_Q(X,field=Field("Q")):
     if blocksB.shape[0]==0:
         B_assembled = field.to_Field(np.zeros((0,shape_1_B_ass),dtype="i"))
     assert(B_assembled.shape[1]== shape_1_B_ass)
-    B_augm=aux.col_echelon(np.concatenate((B_assembled, assemble_block((QM,QV,blocksQ)))),field)[0]
+    B_augm=col_echelon(np.concatenate((B_assembled, assemble_block((QM,QV,blocksQ)))),field)[0]
     B_ech , Q2 = B_augm[:B_assembled.shape[0]],B_augm[B_assembled.shape[0]:]
     zero_col_top_B=np.where([is_all_zero_mat(B_ech[:,i],field) for i in range(B_assembled.shape[1])])[0]
     #print(Q2[:,zero_col_top_B])
@@ -393,7 +393,7 @@ def col_ech_block(X_input,V_ech,PV,PM):
 
 
 
-    B_augm=aux.col_echelon(np.concatenate([B_ass, Q_ass]),field)[0]
+    B_augm=col_echelon(np.concatenate([B_ass, Q_ass]),field)[0]
     B_ech , Q_ech = B_augm[:B_ass.shape[0]],B_augm[B_ass.shape[0]:]
 
     blocks_A=[[ M[i][j]*VxPy_full[b] for j,b in enumerate(blocks_i)]for i,blocks_i in enumerate(blocks)]
@@ -415,4 +415,4 @@ def row_echelon_block(X,V_ech,PV,field=Field("Q")):
     A_block_ech= assemble_block((M,V_ech,blocks))
     diag_P= [ PV[y%len(V)] for y in range(blocks.shape[0])]
     P_block_ech=build_block_diag_l(diag_P,field)
-    return aux.row_echelon(np.concatenate([A_block_ech,P_block_ech],axis=1), field, max_col=A_block_ech.shape[1])
+    return row_echelon(np.concatenate([A_block_ech,P_block_ech],axis=1), field, max_col=A_block_ech.shape[1])
