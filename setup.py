@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='sky-inv-quiv',
-    version="0.1.0",
+    version="0.1.1",
     author='Marcf',
     license='MIT',
     install_requires=['numpy>=2.3.1','scipy>=1.10.0','cfractions>=2.4.1','networkx>=2.6.2','matplotlib>=3.10.7'],
