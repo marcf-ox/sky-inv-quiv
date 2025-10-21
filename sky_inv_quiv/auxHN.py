@@ -13,8 +13,8 @@ import traceback as tr
 import sys,copy
 from cfractions import Fraction
 
-import sky_inv_quiv.Field 
-import sky_inv_quiv.Quiver
+import sky_inv_quiv.Field as Field
+import sky_inv_quiv.Quiver as Quiver
 
 
 
