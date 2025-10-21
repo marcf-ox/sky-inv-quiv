@@ -154,9 +154,9 @@ def computeHN_sub(V,x,filtration=False,verbose=False):    # assumes V=<V_x>
                 l=l+ [dims_subrep+ dims_quot for dims_quot in computeHN_sub(quotrep,x,filtration,verbose)]
             except ValueError as e:
                 print("e2",e)
-                V.display_graph("V")
-                subrep.display_graph("U")
-                quotrep.display_graph("V/U")
+                #V.display_graph("V")
+                #subrep.display_graph("U")
+                #quotrep.display_graph("V/U")
                 print('V', V.spaces.values(),'subrep', subrep.spaces.values(), 'quotrep', quotrep.spaces.values())
                 raise
     return l
@@ -174,14 +174,14 @@ def computeHN(V,x_set=False,filtration=False,verbose=False):
             try:
                 l=computeHN_sub(span_subrep,x,filtration,verbose)
             except ValueError as e:
-                V.display_graph("V2")
-                span_subrep.display_graph("U2")
+                #V.display_graph("V2")
+                #span_subrep.display_graph("U2")
                 print("e",e)
                 raise
-            V.display_graph("V",verbose)
+            #V.display_graph("V",verbose)
             skyscraper[x]= [np.zeros(len(V.vertices),dtype="i")]+l+[np.array(list(span_subrep.spaces.values()))]
             if sum(list(span_subrep.spaces.values()))<sum(list(V.spaces.values())):
-                span_subrep.display_graph("<V_{"+str(x)+"}>",verbose)
+                #span_subrep.display_graph("<V_{"+str(x)+"}>",verbose)
                 skyscraper[x]+= [np.array(list(V.spaces.values()))]
     return skyscraper
 
@@ -198,7 +198,7 @@ def build_spanning_maps(V,x):
                 try:
                     assert(Field.is_all_zero_mat(maps_span[V.edges[e][1]]-np.dot( V.Ve[e], maps_span[V.edges[e][0]]), field))
                 except:
-                    V.display_graph("V")
+                    #V.display_graph("V")
                     print(x)
                     print("r",V.edges[e],maps_span[V.edges[e][1]],np.dot( V.Ve[e], maps_span[V.edges[e][0]]), field)
                     raise
