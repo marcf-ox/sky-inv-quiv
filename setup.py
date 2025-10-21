@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='HN-filtration',
+    name='sky-inv-quiv',
     version="0.1.0",
     author='Marcf',
     license='MIT',
