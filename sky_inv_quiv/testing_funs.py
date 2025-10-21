@@ -3,7 +3,7 @@ import numpy as np
 from time import time
 import copy
 import auxHN as aux
-from mainHN import computeHN
+from sky_inv_quiv.mainHN import computeHN
 import scipy.linalg
 
 epsilon=1e-10
