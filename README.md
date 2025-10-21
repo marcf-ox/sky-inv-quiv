@@ -6,7 +6,7 @@
 <section>
   <h2>
     Installation
-    <\h2>
+  </h2>
     It may be installed via
 
 ```
@@ -14,7 +14,7 @@ pip install git+https://github.com/marcf-ox/HNcode
 ```
 
 This requires Python >=3.8.0, Numpy>=2.4.1, Scipy>=1.10.0, cfractions>=2.4.1, Networkx>=2.6.2, Matplotlib>=3.10.7.
-<\section>
+</section>
 
 <section>
   <h2>
