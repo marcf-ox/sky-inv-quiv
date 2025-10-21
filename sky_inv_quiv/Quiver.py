@@ -2,7 +2,7 @@ import numpy as np
 from time import time,sleep
 import matplotlib.pyplot as plt
 import networkx as nx
-import sky_inv_quiv.Field 
+import sky_inv_quiv.Field as Field
 
 ## QUIVER REP
 #definition
