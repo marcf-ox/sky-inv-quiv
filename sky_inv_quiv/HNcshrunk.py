@@ -1,11 +1,11 @@
 import numpy as np
 import scipy as sc
 import copy as copy
-import auxHN as aux
+import sky_inv_quiv.auxHN as aux
 from time import time,sleep
 import math
-import Field
-import Quiver
+import sky_inv_quiv.Field
+import sky_inv_quiv.Quiver
 epsilon=1e-10
 
 
