@@ -13,8 +13,8 @@ import traceback as tr
 import sys,copy
 from cfractions import Fraction
 
-import sky_inv_quiv.Field as Field
-import sky_inv_quiv.Quiver as Quiver
+from sky_inv_quiv.Field import Field, flatten_zero, is_all_zero_elem, build_block_diag, is_all_zero_mat
+from sky_inv_quiv.Quiver import Quiver
 
 
 
@@ -28,9 +28,9 @@ def int_module(vertices,edges,support,field):
     Ve={}
     for e in edges:
         Ve[e]= field.to_Field(np.ones((int(support[edges[e][1]]) ,int(support[edges[e][0]]))))
-    return Quiver.Quiver(vertices,edges,Ve,field,grid=True)
+    return Quiver(vertices,edges,Ve,field,grid=True)
     
-def int_module_in_grid_quiver(xmax,sources,targets,field=Field.Field ("Q")):
+def int_module_in_grid_quiver(xmax,sources,targets,field=Field ("Q")):
     #build vertices and edges
     vertices=[(ij % xmax[0],ij//xmax[0]) for ij in range(xmax[0]*xmax[1])]
     edges={}
@@ -46,7 +46,7 @@ def int_module_in_grid_quiver(xmax,sources,targets,field=Field.Field ("Q")):
         support[v]= any([all(np.array(v)>= np.array(s)) for s in sources]) and any([all(np.array(v)<= np.array(t)) for t in targets])
     return int_module(vertices,edges,support,field),support
 
-def grid_indec(xmax, field=Field.Field("Q")):
+def grid_indec(xmax, field=Field("Q")):
     vertices=[(ij % xmax[0],ij//xmax[0]) for ij in range(xmax[0]*xmax[1])]
     edges={}
     Ve={}
@@ -70,9 +70,9 @@ def grid_indec(xmax, field=Field.Field("Q")):
        else:
            Ve[e]= field.to_Field(np.zeros((0, 0),dtype="i"))
     a=0
-    return Quiver.Quiver(vertices,edges,Ve,field,grid=True)
+    return Quiver(vertices,edges,Ve,field,grid=True)
     
-def random_grid_indec(xmax, d_x,n_maps, d_y, field=Field.Field("Q")):
+def random_grid_indec(xmax, d_x,n_maps, d_y, field=Field("Q")):
     vertices=[(ij % xmax[0],ij//xmax[0]) for ij in range(xmax[0]*xmax[1])]
     edges={}
     Ve={}
@@ -93,9 +93,9 @@ def random_grid_indec(xmax, d_x,n_maps, d_y, field=Field.Field("Q")):
             Ve[e]= field.to_Field(A[e[1]+e[2]])
         else:
            Ve[e]= field.to_Field(np.zeros((0, 0),dtype="i"))
-    return Quiver.Quiver(vertices,edges,Ve,field,grid=True)
+    return Quiver(vertices,edges,Ve,field,grid=True)
     
-def star_quiver(d_x,n_maps,d_y,field=Field.Field("Q")):
+def star_quiver(d_x,n_maps,d_y,field=Field("Q")):
     vertices = list(range(n_maps+1))
     edges={}
     Ve={}
@@ -103,7 +103,7 @@ def star_quiver(d_x,n_maps,d_y,field=Field.Field("Q")):
     for i in range(1,n_maps+1):
         edges[(0,i)]=[0,i]
         Ve[(0,i)]= field.to_Field(A[i])
-    return Quiver.Quiver(vertices,edges,Ve,field,grid=False)
+    return Quiver(vertices,edges,Ve,field,grid=False)
     
     
 def ind_vertex(vertices,edges, x,field):
@@ -115,12 +115,12 @@ def ind_vertex(vertices,edges, x,field):
             Ve[i_e]= field.to_Field(np.zeros((1,0),dtype="i"))
         else:
             Ve[i_e]=field.to_Field(np.zeros((0,0),dtype="i"))
-    return Quiver.Quiver(vertices,edges,Ve,field)
+    return Quiver(vertices,edges,Ve,field)
 
 def direct_sum(V,W):
     assert (V.edges.items() == W.edges.items() and V.field.descr==W.field.descr )
-    maps=dict(zip(V.edges,[Field.build_block_diag(V.Ve[e],W.Ve[e],V.field) for e in V.edges]))
-    Q=Quiver.Quiver(V.vertices, V.edges,maps,V.field,grid=V.grid)
+    maps=dict(zip(V.edges,[build_block_diag(V.Ve[e],W.Ve[e],V.field) for e in V.edges]))
+    Q=Quiver(V.vertices, V.edges,maps,V.field,grid=V.grid)
     return Q
         
 def subrep(V,Wx):
@@ -141,7 +141,7 @@ def subrep(V,Wx):
             print(repr(Wx[V.edges[e][0]])+" "+repr(Wx[V.edges[e][1]])+" "+repr(We[e]))
             raise ValueError("e1")
         '''
-    return Quiver.Quiver(V.vertices, V.edges, We,V.field,grid=V.grid)
+    return Quiver(V.vertices, V.edges, We,V.field,grid=V.grid)
     
 def quotientrep(V,Wx):
     assert (V.vertices==list(Wx.keys()))
@@ -156,7 +156,7 @@ def quotientrep(V,Wx):
         VeWseT=np.dot(We[e],WxT[V.edges[e][0]])
         Vte_adpt=np.concatenate((WxT[V.edges[e][1]],Wx[V.edges[e][1]]),axis=1)
         We[e]=inverse_image_vect(Vte_adpt,VeWseT, V.field)[:WxT[V.edges[e][1]].shape[1]]   
-    return Quiver.Quiver(V.vertices, V.edges, We,V.field,grid=V.grid)
+    return Quiver(V.vertices, V.edges, We,V.field,grid=V.grid)
    
  
 ## LINEAR ALGEBRA
@@ -167,7 +167,7 @@ def row_echelon(M_input,field, max_col= None,track_swaps=False):
     swaps=np.arange(M_input.shape[0])
     if max_col is None:
         max_col=M_input.shape[1]
-    M= Field.flatten_zero(copy.deepcopy(M_input),field)
+    M= flatten_zero(copy.deepcopy(M_input),field)
     #empty matrix
     if M.shape[0]*M.shape[1]==1:
         if M[0][0] == 0:
@@ -187,7 +187,7 @@ def row_echelon(M_input,field, max_col= None,track_swaps=False):
             else:
                 best_row=non_zero_rows_sub[0]
         #swap rows
-        if not Field.is_all_zero_elem(M[best_row][col],field):
+        if not is_all_zero_elem(M[best_row][col],field):
             rw=np.copy(M[next_pivot_row])
             M[next_pivot_row]=np.copy(M[best_row])
             M[best_row]=rw
@@ -197,7 +197,7 @@ def row_echelon(M_input,field, max_col= None,track_swaps=False):
         else: # the column col is null
             return next_pivot_row
         #echelonify the matrix
-        non_zero_sub_pivot= next_pivot_row+1+ np.where(   np.transpose(Field.flatten_zero(M[next_pivot_row+1:,col],field)) !=0)[0]
+        non_zero_sub_pivot= next_pivot_row+1+ np.where(   np.transpose(flatten_zero(M[next_pivot_row+1:,col],field)) !=0)[0]
         quotient_values= M[non_zero_sub_pivot,col] /rw[0]
         M[ non_zero_sub_pivot,col:] -= np.matmul( quotient_values.reshape((quotient_values.shape[0],1)) ,rw.reshape((1,rw.shape[0])) )
 
@@ -211,13 +211,13 @@ def row_echelon(M_input,field, max_col= None,track_swaps=False):
           break
       next_pivot_row=echelonify(next_pivot_row, i)
     #remove some computation errors
-    M=Field.flatten_zero(M,field)
+    M=flatten_zero(M,field)
     #reduce M
     for i in range(len(pivots)):
         M[i]/= M[i][pivots[i]]
         rw=np.copy(M[i])
         for j in range(i):
-            if not(Field.is_all_zero_elem(M[j][pivots[i]],field)):
+            if not(is_all_zero_elem(M[j][pivots[i]],field)):
                 M[j] -= rw* M[j][pivots[i]] 
     if track_swaps:
         return np.array(M),pivots,swaps
@@ -240,10 +240,10 @@ def null_space(M,field):
     if field.descr in ['R','C']:
         return scipy.linalg.null_space(M,rcond=epsilon)
     # otherwise column echelon of the augmanted matrix
-    M=Field.flatten_zero(M,field)
-    aug_mat=Field.flatten_zero(col_echelon(np.concatenate([M, field.to_Field(np.eye(M.shape[1]))]),field)[0],field)
+    M=flatten_zero(M,field)
+    aug_mat=flatten_zero(col_echelon(np.concatenate([M, field.to_Field(np.eye(M.shape[1]))]),field)[0],field)
     #column of the kernel base
-    zero_col_top=[Field.is_all_zero_mat(aug_mat[:M.shape[0],i],field) for i in range(M.shape[1])]
+    zero_col_top=[is_all_zero_mat(aug_mat[:M.shape[0],i],field) for i in range(M.shape[1])]
     return aug_mat[M.shape[0]:,np.array(zero_col_top)]
     
         
@@ -251,8 +251,8 @@ def null_space(M,field):
 #( U)
 #(-V)
 def intersection(U,V,field):
-    U=Field.flatten_zero(U,field)
-    V=Field.flatten_zero(V,field)
+    U=flatten_zero(U,field)
+    V=flatten_zero(V,field)
     M=np.concatenate((U,-V),axis=1)
     #empty matrix
     if np.shape(M)[0]*np.shape(M)[1]==0:
@@ -278,10 +278,10 @@ def complete_basis(M,field):
     swaps_inv=np.zeros(len(swaps),dtype="i")
     for i in range(len(swaps)):
         swaps_inv[swaps[i]]=i
-    good_cols = [i for i in range(M.shape[0]) if not(Field.is_all_zero_mat(col_ech[:,swaps_inv[M.shape[1]+i]],field))]
+    good_cols = [i for i in range(M.shape[0]) if not(is_all_zero_mat(col_ech[:,swaps_inv[M.shape[1]+i]],field))]
     if len(good_cols)==0:
         return field.to_Field(np.zeros((M.shape[0],0),dtype="i"))
-    #non_zero_cols=[not(Field.is_all_zero_mat(col_ech[:,M.shape[1]+i],field))  for i in range(M.shape[0])]
+    #non_zero_cols=[not(is_all_zero_mat(col_ech[:,M.shape[1]+i],field))  for i in range(M.shape[0])]
     complete_base= field.to_Field(np.eye(M.shape[0]))[:,np.array(good_cols)]
     if extract_basis(np.concatenate([M,complete_base],axis=1), field).shape[1]!=M.shape[0]:
         print(M , "col_ech \n",col_ech,"\n swaps",swaps,"complete_base",complete_base)
@@ -289,8 +289,8 @@ def complete_basis(M,field):
     return  complete_base
 
 def sum_subspaces(U,V,field):
-    U=Field.flatten_zero(U,field)
-    V=Field.flatten_zero(V,field)
+    U=flatten_zero(U,field)
+    V=flatten_zero(V,field)
     M=np.concatenate((U,V),axis=1)
     return extract_basis(M,field)
 
@@ -310,7 +310,7 @@ def ech_to_diag_row(T_input,field):
     pivots=[]
     for i in range(min(T.shape)):
         col_piv=i
-        while col_piv < T.shape[1] and Field.is_all_zero_elem(T[i][col_piv], field) :
+        while col_piv < T.shape[1] and is_all_zero_elem(T[i][col_piv], field) :
             col_piv+=1
         if col_piv<T.shape[1]:
             pivots.append(col_piv)
@@ -353,7 +353,7 @@ def inverse_image(M,K,field):
     if field.descr in ['R','C']:
         non_zero_cols=np.where(np.max(np.abs(Img_M),axis=0)>epsilon)[0]
     else:
-        non_zero_cols=[i  for i,M_col_i in enumerate(list(Img_M.transpose())) if not(Field.is_all_zero_mat(M_col_i,field)) ]
+        non_zero_cols=[i  for i,M_col_i in enumerate(list(Img_M.transpose())) if not(is_all_zero_mat(M_col_i,field)) ]
     Img_M=Img_M[:,non_zero_cols]
     #basis of Im(M)\cap K
     Img_inter=intersection(Img_M,K,field)
@@ -375,10 +375,10 @@ def inverse_image_vect(M,y,field):
     if len(pivots)>0 and pivots[-1]>= np.shape(M)[1]:
         return np.array([]).reshape(np.shape(M)[0],0)
     #tranform into square invertible triangular matrix and solve
-    non_zero_rows = np.array([i for i in range(len(M_ech)) if not(Field.is_all_zero_mat(M_ech[i],field))])
+    non_zero_rows = np.array([i for i in range(len(M_ech)) if not(is_all_zero_mat(M_ech[i],field))])
     #M=0
     if len(non_zero_rows)==0:
-        assert(Field.is_all_zero_mat(y, field))
+        assert(is_all_zero_mat(y, field))
         return  field.to_Field(np.eye(M.shape[0]))
     try:
         x_part= solve_triangular(M_ech[non_zero_rows][:,np.array(pivots)],Augmented_mat[non_zero_rows][:,len(M[0]):] ,field)
@@ -398,9 +398,9 @@ def inverse_image_vect_from_ech(M_ech,pivots,y,field):
     #empty matrix
     if M_ech.shape[1]*M_ech.shape[0] * y.shape[1]==0:
         return np.array([]).reshape(M_ech.shape[1],y.shape[1])
-    is_zero_row=np.array([Field.is_all_zero_mat(M_ech[i,:],field) for i in range(M_ech.shape[0])])
+    is_zero_row=np.array([is_all_zero_mat(M_ech[i,:],field) for i in range(M_ech.shape[0])])
     #no solution
-    if not(Field.is_all_zero_mat(y[is_zero_row],field)):
+    if not(is_all_zero_mat(y[is_zero_row],field)):
         return np.array([]).reshape(np.shape(M_ech)[0],0)
     #extract invertible minor and solve
     M_square,y_square= M_ech[ np.logical_not(is_zero_row)][:,np.array(pivots)], y[ np.logical_not(is_zero_row)]
@@ -417,7 +417,7 @@ def spanning_subrep(V,x,Vx):
     while len(pile)>0:
         for e in V.edges_out[pile.pop()]:
             try:
-                Wx[V.edges[e][1]]=Field.flatten_zero(extract_basis(np.dot(V.Ve[e], Wx[V.edges[e][0]]),V.field),V.field)
+                Wx[V.edges[e][1]]=flatten_zero(extract_basis(np.dot(V.Ve[e], Wx[V.edges[e][0]]),V.field),V.field)
                 assert(Wx[V.edges[e][1]].shape[0]>0 or Wx[V.edges[e][1]].shape[1]==0)
             except:
                 sleep(0.1)
@@ -433,12 +433,12 @@ def bases_change(V,P):
     for e in V.edges.keys():
         y=np.matmul(V.Ve[e],P[V.edges[e][0]] )
         We[e]= inverse_image_vect(P[V.edges[e][1]], y, V.field)
-    return Quiver.Quiver(V.vertices,V.edges,We,V.field,V.grid)
+    return Quiver(V.vertices,V.edges,We,V.field,V.grid)
         
 
 
 def test_subrep_quotient_rep(field_descr):
-    field=Field.Field(field_descr)
+    field=Field(field_descr)
     V1,_= int_module_in_grid_quiver([5,4], [1,1], [3,2],field)
     V2,_= int_module_in_grid_quiver([5,4], [0,1], [3,3],field)
     
@@ -460,7 +460,7 @@ def test_subrep_quotient_rep(field_descr):
     WT.display_graph(label="V/W")
 
 '''
-field=Field.Field("Q")
+field=Field("Q")
 Wx=np.array([1,0,0]).reshape((3,1))*field.one
 print(type(complete_basis(Wx, field)[0][0]))
 '''
