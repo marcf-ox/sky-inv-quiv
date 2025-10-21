@@ -10,7 +10,7 @@ epsilon=1e-10
 import warnings
 import traceback
 import matplotlib.pyplot as plt
-import sky_inv_quiv.Field
+import sky_inv_quiv.Field as Field
 warnings.simplefilter("error")
 
 
