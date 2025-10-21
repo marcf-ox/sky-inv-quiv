@@ -4,8 +4,8 @@ import copy as copy
 import sky_inv_quiv.auxHN as aux
 from time import time,sleep
 import math
-import sky_inv_quiv.Field
-import sky_inv_quiv.Quiver
+import sky_inv_quiv.Field as Field
+import sky_inv_quiv.Quiver as Quiver
 epsilon=1e-10
 
 
