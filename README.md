@@ -10,7 +10,7 @@
     It may be installed via
 
 ```
-pip install git+https://github.com/marcf-ox/HNcode
+pip install git+https://github.com/marcf-ox/sky-inv-quiv
 ```
 
 This requires Python >=3.8.0, Numpy>=2.4.1, Scipy>=1.10.0, cfractions>=2.4.1, Networkx>=2.6.2, Matplotlib>=3.10.7.
