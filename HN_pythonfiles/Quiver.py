@@ -41,8 +41,8 @@ class Quiver:
         return not(any(self.spaces.values()))
     
     def display_graph(self,label="",verbose=True):
+        plt.ion()
         if verbose:
-            plt.ion()
             ax = plt.gca()
             ax.set_title(label)
             G = nx.DiGraph()
