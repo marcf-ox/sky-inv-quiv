@@ -29,7 +29,7 @@ This requires Python >=3.9.0, Numpy>=2.1.1, Scipy>=1.9.0, cfractions>=2.3.1, Net
 
  A Jupyter tutorial notebook is available at:
 
-<a href = https://github.com/marcf-ox/HNcode/notebook/tuto.ipynb> Tutorial notebook </a>
+<a href = https://github.com/marcf-ox/sky-inv-quiv/blob/main/notebook/tutorial.ipynb> Tutorial notebook </a>
 
 
 </section> 
