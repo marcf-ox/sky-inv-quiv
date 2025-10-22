@@ -3,8 +3,9 @@
    This package implements in Python an algorithm to compute the skyscaper invariant [2] over a finite grid poset. This algorithm relies on the ideas described in [1] and works for coefficients in any field. In particular, when the coefficients are in
   <ul>
     <li><strong>&#x211A;</strong> — we use the <code>cfraction</code> library for exact computations</li>
-    <li><strong>&#x211D; or &#x2102;</strong> — we use NumPy/SciPy, which may create errors for matrices that are not well conditioned</li>
+    <li><strong>&#x211D; or &#x2102;</strong> — we use NumPy/SciPy, with a fixed precision</li>
     <li><strong>&#x2124;/2&#x2124;</strong> — we recommend using instead the algorithm at <a href="https://github.com/JanJend/Skyscraper-Invariant">https://github.com/JanJend/Skyscraper-Invariant</a></li>
+    <li>the algorithm supports custom field through the Field class</li>
   </ul>
 </section>
 
