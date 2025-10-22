@@ -11,6 +11,7 @@ import warnings
 import traceback
 import matplotlib.pyplot as plt
 from sky_inv_quiv.Field import Field,flatten_zero,is_all_zero_mat
+from sky_inv_quiv.Quiver import Quiver
 warnings.simplefilter("error")
 
 
@@ -136,15 +137,15 @@ def computeHN_sub(V,x,filtration=False,verbose=False):    # assumes V=<V_x>
     if U0.shape[1]==V.spaces[x]:
         return[]
     span_rep= spanning_subrep(V, x, U0)
-    subrep= subrep(V,span_rep)
-    dims_subrep=np.array(list(subrep.spaces.values()))
+    subrep_obj= subrep(V,span_rep)
+    dims_subrep=np.array(list(subrep_obj.spaces.values()))
     if v_x>6 and v_x_small>3:
-        print("c=",(v_notx+v_x)*subrep.spaces[x]- v_x*np.sum(dims_subrep))
+        print("c=",(v_notx+v_x)*subrep_obj.spaces[x]- v_x*np.sum(dims_subrep))
     l=[]
     if verbose:
         print("srep",np.sum(dims_subrep))
-    if not(subrep.is_zero()):
-        l=computeHN_sub(subrep,x,filtration,verbose)+[dims_subrep]
+    if not(subrep_obj.is_zero()):
+        l=computeHN_sub(subrep_obj,x,filtration,verbose)+[dims_subrep]
         quotrep= quotientrep(V, span_rep)
         if verbose:
             print("qrep",sum(quotrep.spaces.values()))
@@ -156,11 +157,11 @@ def computeHN_sub(V,x,filtration=False,verbose=False):    # assumes V=<V_x>
                 #V.display_graph("V")
                 #subrep.display_graph("U")
                 #quotrep.display_graph("V/U")
-                print('V', V.spaces.values(),'subrep', subrep.spaces.values(), 'quotrep', quotrep.spaces.values())
+                print('V', V.spaces.values(),'subrep', subrep_obj.spaces.values(), 'quotrep', quotrep.spaces.values())
                 raise
     return l
     
-def computeHN(V,x_set=False,filtration=False,verbose=False): 
+def computeHN(V:Quiver,x_set=False,filtration=False,verbose=False): 
     if x_set==False:
         x_set=V.vertices
     skyscraper={}
