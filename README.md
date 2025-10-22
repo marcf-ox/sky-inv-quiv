@@ -5,7 +5,7 @@
     <li><strong>&#x211A;</strong> — we use the <code>cfraction</code> library for exact computations</li>
     <li><strong>&#x211D; or &#x2102;</strong> — we use NumPy/SciPy, with a fixed precision</li>
     <li><strong>&#x2124;/2&#x2124;</strong> — we recommend using instead the algorithm at <a href="https://github.com/JanJend/Skyscraper-Invariant">https://github.com/JanJend/Skyscraper-Invariant</a></li>
-    <li>the algorithm supports custom field through the Field class</li>
+    <li>the algorithm supports custom fields through the <code>Field</code> class</li>
   </ul>
 </section>
 
