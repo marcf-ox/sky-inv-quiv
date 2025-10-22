@@ -1,4 +1,4 @@
-import sky_inv_quiv.Field
+from sky_inv_quiv.Field import Field, is_all_zero_mat
 import numpy as np
 from time import time
 import copy
@@ -23,7 +23,7 @@ def random_change_bases(V):
             P[x]=V.field.to_Field(p)
     return aux.bases_change(V,P)
     
-def test_skyscraper(grid_size,n_int,verbose=False,field=Field.Field("Q") ):
+def test_skyscraper(grid_size,n_int,verbose=False,field=Field("Q") ):
     
     V,_=aux.int_module_in_grid_quiver(grid_size, [(1,1)], [(0,0)],field)
     list_V=[]
@@ -62,7 +62,7 @@ def test_skyscraper(grid_size,n_int,verbose=False,field=Field.Field("Q") ):
     success=True
     for x0 in HN1.keys():
         try:
-            assert(len(HN1[x0])==len(HN2[x0]) and all([Field.is_all_zero_mat(HN1[x0][i]-HN2[x0][i],V.field) for i in range(len(HN1[x0]))] ))
+            assert(len(HN1[x0])==len(HN2[x0]) and all([is_all_zero_mat(HN1[x0][i]-HN2[x0][i],V.field) for i in range(len(HN1[x0]))] ))
         except:
             print(x0)
             print("computing from supports:")
@@ -128,7 +128,7 @@ def HN_everywhere_ss(V,x):
 
 
 
-def test1(n=3,n_test=4, field=Field.Field("Q"), start_test = 42):
+def test1(n=3,n_test=4, field=Field("Q"), start_test = 42):
   xmax=[n,n]
   t= time()
   success_fail=[0,0]
@@ -147,7 +147,7 @@ def test1(n=3,n_test=4, field=Field.Field("Q"), start_test = 42):
 
 
 
-def test2 (n=4, field = Field.Field("Q")):
+def test2 (n=4, field = Field("Q")):
 
   xmax=[n,n]
   V1,supp1= aux.int_module_in_grid_quiver( xmax, [(0,0)],[(0,2),(1,1)],field)
@@ -175,9 +175,9 @@ def test2 (n=4, field = Field.Field("Q")):
 
 #tests
 print("test 1:")
-test1(field = Field.Field("F_2"))
-test1(n=5 , field = Field.Field("Q"))
+test1(field = Field("F_2"))
+test1(n=5 , field = Field("Q"))
 print("----------------")
 print("test 2:")
-test2(field = Field.Field("F_2"))
-test2(field = Field.Field("Q"))
+test2(field = Field("F_2"))
+test2(field = Field("Q"))
