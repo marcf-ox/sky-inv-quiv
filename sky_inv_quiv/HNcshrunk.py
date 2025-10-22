@@ -1,7 +1,7 @@
 import numpy as np
 import scipy as sc
 import copy as copy
-from sky_inv_quiv.auxHN import extract_basis,intersection,inverse_image, row_echelon,col_echelon, ech_to_diag_col, null_space,complete_basis
+from sky_inv_quiv.auxHN import extract_basis,intersection,inverse_image, row_echelon,col_echelon, ech_to_diag_col, null_space,complete_basis, inverse_image_vect_from_ech
 from time import time,sleep
 import math
 from sky_inv_quiv.Field import Field, build_block_diag_l, is_all_zero_mat

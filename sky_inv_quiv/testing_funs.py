@@ -174,10 +174,11 @@ def test2 (n=4, field = Field("Q")):
 
 
 #tests
-print("test 1:")
-test1(field = Field("F_2"))
-test1(n=5 , field = Field("Q"))
-print("----------------")
-print("test 2:")
-test2(field = Field("F_2"))
-test2(field = Field("Q"))
+def all_tests():
+    print("test 1:")
+    test1(field = Field("F_2"))
+    test1(n=5 , field = Field("Q"))
+    print("----------------")
+    print("test 2:")
+    test2(field = Field("F_2"))
+    test2(field = Field("Q"))
