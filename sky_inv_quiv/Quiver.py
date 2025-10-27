@@ -3,11 +3,14 @@ from time import time,sleep
 import matplotlib.pyplot as plt
 import networkx as nx
 from sky_inv_quiv.Field import Field
+from typing import List, Dict, Any, Optional
 
 ## QUIVER REP
 #definition
 class Quiver:
-    def __init__(self, vertices, edges,Ve,field=Field('R'),grid=False):
+    def __init__(self, vertices:List, edges:Dict[Any,List],Ve:Dict[Any,np.ndarray],field:Optional[Field]=None,grid:Optional[bool]=False):
+        if field is None:
+            field = Field('Q')
         self.vertices=vertices#Q0
         self.edges = edges 
         self.Ve=Ve
