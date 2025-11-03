@@ -61,6 +61,7 @@ def parse_quiver_file(path: str, field: Optional[Field] = None, grid_flag: bool 
     for e in edges.keys():
         Ve[e] = field.to_Field(np.zeros((dimvec_list_dict[edges[e][1]], dimvec_list_dict[edges[e][0] ]), dtype="i"))
     #read nonzero Ve's
+    print(rep_line[startve :])
     Ve_list = ast.literal_eval(rep_line[startve :].strip())
     for ve in Ve_list:
         Ve[str(ve[0])] = np.array(ve[1]).transpose()
