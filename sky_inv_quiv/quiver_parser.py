@@ -16,6 +16,7 @@ def parse_quiver_file(path: str, field: Optional[Field] = None, grid_flag: bool 
 
     with open(path, "r", encoding="utf-8") as f:
         lines = f.readlines()
+
     if len(lines) < 2:
         raise ValueError("Less than two lines")
 
