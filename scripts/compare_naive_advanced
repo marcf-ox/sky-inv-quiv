@@ -9,7 +9,7 @@ from sky_inv_quiv.quiver_parser import parse_quiver_file
 from time import time  
 from numpy import array
 
-timeout = 0.1 # timeout for each algorithm
+timeout = 600 # timeout for each algorithm
 #open a result file
 report_path = f"comparison_naive_advanced.txt"
 f = open(report_path, "w")
@@ -44,5 +44,5 @@ for field in ["Q", "F_2"]:
             )
             if t1-t0>timeout or t2-t1>timeout:
                 break
-            print(f"Field: {field}, dim: {dim}, grid_size: {grid_size}x{grid_size}, success: {success}, time_naive: {(t1 - t0) * 1000:.2f}ms, time_adv: {(t2 - t1) * 1000:.2f}ms")
+                print(f"Field: {field}, dim: {dim}, grid_size: {grid_size}")
 f.close()

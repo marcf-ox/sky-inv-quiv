@@ -24,6 +24,17 @@ from sky_inv_quiv.testing_funs import test_skyscraper, all_tests
 # from auxHN import int_module_in_grid_quiver, direct_sum, ind_vertex  # type: ignore
 # from testing_funs import test_skyscraper, all_tests  # type: ignore
 
+from auxHN import inverse_image_vect, null_space # type: ignore
+
+field = Field("F_2")
+A = field.to_Field(np.zeros((1,1),dtype="i"))
+W = field.to_Field(np.ones((1,1),dtype="i"))
+print(inverse_image_vect(A,W,field).shape)
+print(null_space(A,field).shape)
+
+
+
+
 
 #test advanced
 all_tests()
