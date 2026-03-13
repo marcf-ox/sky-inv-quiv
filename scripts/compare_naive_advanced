@@ -44,4 +44,5 @@ for field in ["Q", "F_2"]:
             )
             if t1-t0>timeout or t2-t1>timeout:
                 break
+            print(f"Field: {field}, dim: {dim}, grid_size: {grid_size}x{grid_size}, success: {success}, time_naive: {(t1 - t0) * 1000:.2f}ms, time_adv: {(t2 - t1) * 1000:.2f}ms")
 f.close()

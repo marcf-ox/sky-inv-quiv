@@ -402,8 +402,10 @@ def inverse_image_vect(M:np.ndarray,y:np.ndarray,field:Field)->np.ndarray:
     non_zero_rows = np.array([i for i in range(len(M_ech)) if not(is_all_zero_mat(M_ech[i],field))])
     #M=0
     if len(non_zero_rows)==0:
-        assert(is_all_zero_mat(y, field))
-        return  field.to_Field(np.eye(M.shape[0]))
+        if (is_all_zero_mat(y, field)):
+            return  field.to_Field(np.eye(M.shape[0]))
+        else:
+            return field.to_Field(np.zeros((M.shape[0],0),dtype="i"))
     try:
         x_part= solve_triangular(M_ech[non_zero_rows][:,np.array(pivots)],Augmented_mat[non_zero_rows][:,len(M[0]):] ,field)
     except:
