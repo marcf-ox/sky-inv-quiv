@@ -1,0 +1,16 @@
+{
+    "python.defaultInterpreterPath": "${workspaceFolder}/../../HNenv/Scripts/python.exe",
+    "python.analysis.extraPaths": [
+        "${workspaceFolder}/../../HNenv/lib/site-packages"
+    ],
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.python"
+    },
+    "mypy-run": "onSave",
+    "mypy-dmypy-status-file": ".dmypy.json",
+    "mypy-junit-xml-output": "",
+    "mypy-args": [
+        "--config-file=${workspaceFolder}/mypy.ini",
+        "--show-error-codes"
+    ]
+}

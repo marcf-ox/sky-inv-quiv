@@ -1,0 +1,14 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = false
+show_error_codes = true
+
+[[tool.mypy.overrides]]
+module = ["scipy.*", "numpy.*", "matplotlib.*", "networkx.*"]
+ignore_missing_imports = true
