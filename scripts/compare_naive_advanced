@@ -1,0 +1,47 @@
+# compare the output and times of the naive and advanced algorithms on the same quiver files, for both fields Q and F_2
+import argparse
+import numpy as np
+from datetime import datetime
+from sky_inv_quiv import computeHN
+from sky_inv_quiv import Field
+from sky_inv_quiv.naive_code import naive_sub_HN
+from sky_inv_quiv.quiver_parser import parse_quiver_file
+from time import time  
+from numpy import array
+
+timeout = 0.1 # timeout for each algorithm
+#open a result file
+report_path = f"comparison_naive_advanced.txt"
+f = open(report_path, "w")
+
+#input script python cheng_alg input_file.txt field
+for field in ["Q", "F_2"]:
+    for dim in range(2,5):
+        for grid_size in range(2,5):
+            input_file = f"sky-inv-quiv/notebook/torus_dim{dim}_1_{grid_size}x{grid_size}.txt"
+
+            #parse the quiver file
+            Q = parse_quiver_file(input_file,field = Field(field),grid_flag=True)
+            try:
+                t0 = time()
+                HN_naive = computeHN(Q, comp_HN_sub=naive_sub_HN)
+                t1 = time()
+                HN_adv = computeHN(Q)
+                t2=time()
+            except:
+                print(field, dim, grid_size, "error during computation")
+                raise
+            # compare HN_naive and HN_adv
+            success=True
+            for x in Q.vertices:
+                success &= (len(HN_adv[x]) == len(HN_naive[x]))
+                for i in range(len(HN_adv[x])):
+                    success &= np.array_equal(HN_adv[x][i], HN_naive[x][i])
+            f.write(
+                f"Field: {field}, dim: {dim}, "
+                f"grid_size: {grid_size}x{grid_size}, success: {success}, "
+                f"time_naive: {(t1 - t0) * 1000:.2f}ms, time_adv: {(t2 - t1) * 1000:.2f}ms\n"
+            )
+            if t1-t0>timeout or t2-t1>timeout:
+                break
+f.close()

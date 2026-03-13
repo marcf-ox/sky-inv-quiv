@@ -25,7 +25,7 @@ def naive_sub_HN(V:Quiver,x,filtration:bool=False,verbose:bool=False) -> List[np
     v_notx=sum(list(V.spaces.values()))-v_x
     # build random A
     U: Optional[np.ndarray] = None
-    for d in range(1,v_x*v_notx+1):
+    for d in range(1,(v_x*v_notx)**2 +100):
         max_val_random = 2*d*v_x*v_notx+10
         A = np.block(
             [
@@ -63,7 +63,7 @@ def naive_shrunk(maps_span_l:List[np.ndarray],A:np.ndarray, field:Field)->Option
     vx = maps_span_l[0].shape[1]
     n=len(maps_span_l)
     dim_W=0
-    for _ in range(min(A.shape)):
+    for _ in range(min(A.shape)+1):
         U = np.concatenate([inverse_image_vect(A,W,field), null_space(A,field)], axis = 1)
         W_blocks = []
         for i in range (n):
@@ -76,8 +76,6 @@ def naive_shrunk(maps_span_l:List[np.ndarray],A:np.ndarray, field:Field)->Option
             if (W.shape[1] == WcapImA.shape[1]):
                 return extract_basis(U[:vx,:], field)
         dim_W = W.shape[1]
-    print(A.shape, extract_basis(A,field).shape,W.shape, extract_basis(W,field).shape)
-    print(intersection(W,A,field).shape, extract_basis(intersection(W,A,field),field).shape)
     return None
     
 
