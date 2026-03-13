@@ -8,7 +8,7 @@ from typing import List, Dict, Any, Optional
 ## QUIVER REP
 #definition
 class Quiver:
-    def __init__(self, vertices:List, edges:Dict[Any,List],Ve:Dict[Any,np.ndarray],field:Optional[Field]=None,grid:Optional[bool]=False):
+    def __init__(self, vertices:List, edges:Dict[Any,List],Ve:Dict[Any,np.ndarray],field:Optional[Field]=None,grid:bool=False):
         if field is None:
             field = Field('Q')
         self.vertices=vertices#Q0
@@ -40,15 +40,15 @@ class Quiver:
                 print([(e,self.Ve[e]) for e in self.edges_out[x]])
             self.spaces[x]= dims_x[0]
             
-    def is_zero(self):
+    def is_zero(self)->bool:
         return not(any(self.spaces.values()))
     
-    def display_graph(self,label="",verbose=True):
+    def display_graph(self,label="",verbose=True)->None:
         plt.ion()
         if verbose:
             ax = plt.gca()
             ax.set_title(label)
-            G = nx.DiGraph()
+            G: nx.DiGraph = nx.DiGraph()
             G.add_nodes_from(self.vertices)
             edges= [(e[0],e[1]) for e in self.edges.values()]
             G.add_edges_from(edges)
@@ -64,10 +64,10 @@ class Quiver:
         plt.show()
         plt.pause(0.05)
   #display
-    def __str__(self):
+    def __str__(self)->str:
         return "vertices="+str(self.vertices)+" edges="+str(self.edges)+" Ve="+str(self.Ve_rounded)   
       
-    def __repr__(self):
+    def __repr__(self) -> str:
         return str(self)
     
     

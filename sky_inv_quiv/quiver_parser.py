@@ -1,6 +1,6 @@
 import ast
 import time
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional,Union, Tuple
 import numpy as np
 import math
 
@@ -25,7 +25,7 @@ def parse_quiver_file(path: str, field: Optional[Field] = None, grid_flag: bool 
     start_char = quiver_line.find("Quiver(")+len("Quiver(")
     comma = quiver_line.find(",", start_char)
     
-
+    vertices: List[Union[int, Tuple[int, int]]]
     #parse vertices
     if grid_flag:
         grid_dims = quiver_line[start_char:comma].split(" ")

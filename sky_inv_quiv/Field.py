@@ -2,8 +2,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from cfractions import Fraction
-import scipy as sc
-import networkx as nx
+import scipy as sc  # type: ignore
+import networkx as nx 
+from typing import Any, Callable, Optional, List
 #maximum computation error
 epsilon=1e-10
 
@@ -54,7 +55,7 @@ class Field:
     descr='O'
     zero=0.
     one=1.
-    to_Field=None
+    to_Field:Callable[[Any],Any]
     def __init__(self,*args):
         # usual fields R, C, F_2, Q
         if len(args)==1:
@@ -80,22 +81,25 @@ class Field:
                     return - to_Field(-x)
                 return to_Field(x-1)
 
+
+
 #Replacing numpy operations if the field is not R or C
-#np.zeros
 
-
-def bool_to_field(b,field):
+def bool_to_field(b:bool,field:Field):
     if b:
         return field.one
     return field.zero
        
 
-def build_block_diag(M,N,field):
+def build_block_diag(M:np.ndarray,N:np.ndarray,field:Field)->np.ndarray:
     return np.block([[M, field.to_Field(np.zeros((M.shape[0], N.shape[1]),dtype="i"))],[ field.to_Field(np.zeros((N.shape[0], M.shape[1]),dtype="i")),N]])
 
 
 
-def build_block_diag_l(l,field):
+def build_block_diag_l(l: List[np.ndarray],field:Field)->np.ndarray:
+    """
+    Build the block diagonal of a list of matrices with coefficients in field
+    """
     dim0= sum([ M.shape[0] for M in l])
     dim1= sum([ M.shape[1] for M in l])
     res= field.to_Field(np.zeros((dim0,dim1),dtype="i"))
@@ -106,19 +110,22 @@ def build_block_diag_l(l,field):
     return res
 
             
-def is_all_zero_mat(M,field):
+def is_all_zero_mat(M:np.ndarray,field:Field)->bool:
+    """
+    Check if a matrix is all zero in the given field
+    """
     if len(M.flatten())==0:
         return True
     if field.descr in ['R','C']:
         return np.max(np.abs(M))<epsilon
     return all([m==field.zero for m in M.flatten()])
 
-def is_all_zero_elem(x,field):
+def is_all_zero_elem(x,field:Field)->bool:
     return is_all_zero_mat(np.array([x]).reshape((1,1)),field)
 
 
 #Remove computation errors
-def flatten_zero(U,field):
+def flatten_zero(U:np.ndarray,field:Field)->np.ndarray:
     if field.descr in ['R','C']:
         V=U.flatten()
         V[np.where(np.abs(V)<epsilon)[0]]=0.

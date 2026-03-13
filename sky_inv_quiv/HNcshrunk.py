@@ -1,10 +1,13 @@
 import numpy as np
-import scipy as sc
+import scipy as  sc # type: ignore 
 import copy as copy
-from sky_inv_quiv.auxHN import extract_basis,intersection,inverse_image, row_echelon,col_echelon, ech_to_diag_col, null_space,complete_basis, inverse_image_vect_from_ech
 from time import time,sleep
 import math
+from typing import Tuple,List,Any
+
+from sky_inv_quiv.auxHN import extract_basis,intersection,inverse_image, row_echelon,col_echelon, ech_to_diag_col, null_space,complete_basis, inverse_image_vect_from_ech
 from sky_inv_quiv.Field import Field, build_block_diag_l, is_all_zero_mat
+
 epsilon=1e-10
 
 
@@ -71,7 +74,7 @@ def wongblock(X,field=Field("Q")):
 
 
 
-def wongblockpseudo(X,field=Field("Q"),is_M_ech=True):
+def wongblockpseudo(X:Tuple[np.ndarray,List[np.ndarray],Any],field=Field("Q"),is_M_ech:bool=True):
 
     M,V,blocks=X   
     A= assemble_block(X)
@@ -186,7 +189,7 @@ def wongblockpseudo(X,field=Field("Q"),is_M_ech=True):
 
 
 
-def assemble_block(X):
+def assemble_block(X:Tuple[np.ndarray,List[np.ndarray],Any])->np.ndarray:
     M,V,blocks=X
     if blocks.shape[0]*blocks.shape[1]==0:
         return np.zeros_like(blocks)
@@ -202,12 +205,12 @@ def assemble_block(X):
 
 
 
-def E(n,m,i,j,field):
+def E(n:int,m:int,i:int,j:int,field:Field)->np.ndarray:
     E=field.to_Field(np.zeros((n,m),dtype="i"))
     E[i][j]=field.one
     return E
 
-def buildA(V,d,field):
+def buildA(V,d:int,field:Field):
     vx=np.shape(V[0])[1]
     vtot = sum( [np.shape(Vy)[0] for Vy in V])
     Al=[]
@@ -228,7 +231,7 @@ def buildA(V,d,field):
                 Ad.append( np.kron(E(d,d,i,j,field),A)) 
     return Ad
 
-def buildblock(V,d,v_x_small=1):
+def buildblock(V:List[np.ndarray],d:int,v_x_small:int=1):
     
     v_x=np.shape(V[0])[1]
     v_notx = sum( [np.shape(Vy)[0] for Vy in V])
@@ -266,7 +269,7 @@ def pseudo_inverse(A):
     return Ap
 
 
-def ker_block_Q(X,field=Field("Q")):
+def ker_block_Q(X:Tuple[np.ndarray,List[np.ndarray],Any],field=Field("Q")):
     (M,V,blocks)=X
     #print("blocks =\n",blocks.shape)
     #print("V=\n",V)
@@ -410,7 +413,7 @@ def col_ech_block(X_input,V_ech,PV,PM):
 
 
 
-def row_echelon_block(X,V_ech,PV,field=Field("Q")):
+def row_echelon_block(X:Tuple[np.ndarray,List[np.ndarray],Any],V_ech,PV,field=Field("Q"))->Tuple[np.ndarray,List]:
     (M,V,blocks)=X
     A_block_ech= assemble_block((M,V_ech,blocks))
     diag_P= [ PV[y%len(V)] for y in range(blocks.shape[0])]

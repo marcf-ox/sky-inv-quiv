@@ -6,7 +6,7 @@ Created on Thu Aug 12 19:50:59 2021
 
 
 import numpy as np
-import scipy.linalg
+import scipy.linalg # type: ignore
 from time import time,sleep
 import matplotlib.pyplot as plt
 import traceback as tr
@@ -17,14 +17,14 @@ from sky_inv_quiv.Field import Field, flatten_zero, is_all_zero_elem, build_bloc
 from sky_inv_quiv.Quiver import Quiver
 
 
-
+from typing import List, Dict, Any, Optional,Tuple, Union ,overload, Literal
 
 
 #maximum computation error
 epsilon=1e-10
 
 #interval module of given support  in a  grid of dim xmax 
-def int_module(vertices,edges,support,field):
+def int_module(vertices,edges:Dict,support,field:Field)->Quiver:
     Ve={}
     for e in edges:
         Ve[e]= field.to_Field(np.ones((int(support[edges[e][1]]) ,int(support[edges[e][0]]))))
@@ -72,7 +72,8 @@ def grid_indec(xmax, field=Field("Q")):
     a=0
     return Quiver(vertices,edges,Ve,field,grid=True)
     
-def random_grid_indec(xmax, d_x,n_maps, d_y, field=Field("Q")):
+def random_grid_indec(xmax:List[int], d_x:int,n_maps:int, d_y:int, 
+field:Field=Field("Q"))->Quiver:
     vertices=[(ij % xmax[0],ij//xmax[0]) for ij in range(xmax[0]*xmax[1])]
     edges={}
     Ve={}
@@ -106,7 +107,7 @@ def star_quiver(d_x,n_maps,d_y,field=Field("Q")):
     return Quiver(vertices,edges,Ve,field,grid=False)
     
     
-def ind_vertex(vertices,edges, x,field):
+def ind_vertex(vertices:List,edges:Dict[Any, List], x,field:Field)->Quiver:
     Ve={}
     for i_e,e in edges.items():
         if e[0]== x:
@@ -117,13 +118,13 @@ def ind_vertex(vertices,edges, x,field):
             Ve[i_e]=field.to_Field(np.zeros((0,0),dtype="i"))
     return Quiver(vertices,edges,Ve,field)
 
-def direct_sum(V,W):
+def direct_sum(V:Quiver,W:Quiver)->Quiver:
     assert (V.edges.items() == W.edges.items() and V.field.descr==W.field.descr )
     maps=dict(zip(V.edges,[build_block_diag(V.Ve[e],W.Ve[e],V.field) for e in V.edges]))
     Q=Quiver(V.vertices, V.edges,maps,V.field,grid=V.grid)
     return Q
         
-def subrep(V,Wx):
+def subrep(V:Quiver,Wx:Dict[Any, np.ndarray])->Quiver:
     assert (V.vertices==list(Wx.keys()))
     for x in V.vertices:
         try:
@@ -143,7 +144,7 @@ def subrep(V,Wx):
         '''
     return Quiver(V.vertices, V.edges, We,V.field,grid=V.grid)
     
-def quotientrep(V,Wx):
+def quotientrep(V:Quiver,Wx:Dict[Any, np.ndarray])->Quiver:
     assert (V.vertices==list(Wx.keys()))
     field=V.field
     #orthonormal bases
@@ -162,8 +163,22 @@ def quotientrep(V,Wx):
 ## LINEAR ALGEBRA
     
 
-# Row echelon form (Gaussion pivot)
-def row_echelon(M_input,field, max_col= None,track_swaps=False): 
+# Row echelon form (Gaussian pivot)
+@overload
+def row_echelon(M_input:np.ndarray, field:Field,  max_col:Optional[int]=None,
+                track_swaps: Literal[False] = False) -> Tuple[np.ndarray, List]:
+    ...
+@overload
+def row_echelon(M_input:np.ndarray, field:Field, max_col:Optional[int]=None,
+                track_swaps: Literal[True]=True) -> Tuple[np.ndarray, List,np.ndarray]:
+    ...
+
+@overload
+def row_echelon(M_input:np.ndarray, field:Field, max_col:Optional[int]=None, track_swaps:bool=False) -> Union[Tuple[np.ndarray, List], Tuple[np.ndarray, List, np.ndarray]]:
+    ...
+
+def row_echelon(M_input:np.ndarray,field:Field, max_col: Optional[int]=None,
+track_swaps:bool=False)->Union[Tuple[np.ndarray, List],Tuple[np.ndarray, List, np.ndarray]]:
     swaps=np.arange(M_input.shape[0])
     if max_col is None:
         max_col=M_input.shape[1]
@@ -176,10 +191,10 @@ def row_echelon(M_input,field, max_col= None,track_swaps=False):
     
     pivots=[]
     #create one new echelon
-    def echelonify(next_pivot_row, col):
+    def echelonify(next_pivot_row:int, col:int)->int:
         #choose best row to pivot)
         if (field.descr in ['Q','R','C']) :
-            best_row= next_pivot_row+np.argmax(np.abs(M[next_pivot_row:,col]))
+            best_row= next_pivot_row+ int(np.argmax(np.abs(M[next_pivot_row:,col])))
         else:
             non_zero_rows_sub =  next_pivot_row + np.where(   M[next_pivot_row:M.shape[0],col]!= 0  )[0]
             if len(non_zero_rows_sub)==0:
@@ -227,13 +242,22 @@ def row_echelon(M_input,field, max_col= None,track_swaps=False):
 
 
 #put in column echelon form
-def col_echelon(M,field,max_col=None,track_swaps=False):
+@overload
+def col_echelon(M: np.ndarray, field: Field, max_col: Optional[int] = None, track_swaps: Literal[False] = False) -> Tuple[np.ndarray, List]: ...
+
+@overload
+def col_echelon(M: np.ndarray, field: Field, max_col: Optional[int] = None, track_swaps: Literal[True]=True) -> Tuple[np.ndarray, List, np.ndarray]: ...
+
+@overload
+def col_echelon(M:np.ndarray,field:Field,max_col:Optional[int]=None,track_swaps:bool=False)->Union[Tuple[np.ndarray, List],Tuple[np.ndarray, List, np.ndarray]]: ...
+
+def col_echelon(M:np.ndarray,field:Field,max_col:Optional[int]=None,track_swaps:bool=False)->Union[Tuple[np.ndarray, List],Tuple[np.ndarray, List, np.ndarray]]:    
     row_ech_tr=row_echelon(np.transpose(M),field,max_col=max_col,track_swaps=track_swaps)
     return np.transpose(row_ech_tr[0]),*row_ech_tr[1:]
      
    
 #compute kernel of M
-def null_space(M,field):
+def null_space(M:np.ndarray,field:Field)->np.ndarray:
     if M.shape[1]==0:
         return field.to_Field(np.zeros((0,0),dtype="i"))
     # if field is R or C: SVD
@@ -250,7 +274,7 @@ def null_space(M,field):
 #intersection of two families U and V by computing the kernel of 
 #( U)
 #(-V)
-def intersection(U,V,field):
+def intersection(U:np.ndarray,V:np.ndarray,field:Field)->np.ndarray:
     U=flatten_zero(U,field)
     V=flatten_zero(V,field)
     M=np.concatenate((U,-V),axis=1)
@@ -260,7 +284,7 @@ def intersection(U,V,field):
     u=null_space(M,field)[:np.shape(U)[1]]
     return np.dot(U,u)
     
-def extract_basis(M,field):
+def extract_basis(M:np.ndarray,field:Field)->np.ndarray:
     if M.shape[0]* M.shape[1]==0:
         return M.reshape((M.shape[0],0))
     if field.descr in['R','C']:
@@ -268,7 +292,7 @@ def extract_basis(M,field):
     col_ech,pivots=col_echelon(M, field)
     return col_ech[:,:len(pivots)].reshape((M.shape[0], len(pivots)))
 
-def complete_basis(M,field):
+def complete_basis(M:np.ndarray,field:Field)->np.ndarray:
     if M.shape[1]==0:
         return  field.to_Field(np.eye(M.shape[0]))
     if  field.descr in['Q','R','C']:
@@ -288,23 +312,23 @@ def complete_basis(M,field):
         raise ValueError("e3")
     return  complete_base
 
-def sum_subspaces(U,V,field):
+def sum_subspaces(U:np.ndarray,V:np.ndarray,field:Field)->np.ndarray:
     U=flatten_zero(U,field)
     V=flatten_zero(V,field)
     M=np.concatenate((U,V),axis=1)
     return extract_basis(M,field)
 
 # matrix of a projection from dim tot to dim b
-def proj(a,b,tot,field,B=None):
+def proj(a:int,b:int,tot:int,field:Field,B=None)->np.ndarray:
     if B==None:
         B= field.to_Field(np.eye(b))
     return np.concatenate((field.to_Field(np.zeros((b,a),dtype="i")),B,field.to_Field(np.zeros((b,tot-a-b),dtype="i")) ),axis=1)
 
-def inj(a,b,tot,field):
+def inj(a:int,b:int,tot:int,field:Field):
     return proj(a,b,tot,field).transpose()
 
 # transform a matrix from row echelon form to diagonal
-def ech_to_diag_row(T_input,field):
+def ech_to_diag_row(T_input:np.ndarray,field:Field)->np.ndarray:
     T=copy.deepcopy(T_input)
     #P_pivots s.t. T*P_pivot diag
     pivots=[]
@@ -326,11 +350,11 @@ def ech_to_diag_row(T_input,field):
     return T
 
 # transform a matrix from column echelon form to diagonal    
-def ech_to_diag_col(T_input,field):
+def ech_to_diag_col(T_input:np.ndarray,field:Field)->np.ndarray:
     return np.transpose(ech_to_diag_row(np.transpose(copy.deepcopy(T_input)),field))
 
 # solve Mx=y with M triangular (square)
-def solve_triangular(M,y,field):
+def solve_triangular(M:np.ndarray,y:np.ndarray,field:Field)->np.ndarray:
     if y.shape[1]==0:
         return np.array([]).reshape(M.shape[0],0)
     
@@ -346,14 +370,14 @@ def solve_triangular(M,y,field):
 
 
 # compute the inverse image of M restricted to Im(M)\cap K
-def inverse_image(M,K,field):
+def inverse_image(M:np.ndarray,K:np.ndarray,field:Field)->np.ndarray:
     #column echelon form
     Img_M=col_echelon(M,field)[0]
     #eliminate zero columns
     if field.descr in ['R','C']:
         non_zero_cols=np.where(np.max(np.abs(Img_M),axis=0)>epsilon)[0]
     else:
-        non_zero_cols=[i  for i,M_col_i in enumerate(list(Img_M.transpose())) if not(is_all_zero_mat(M_col_i,field)) ]
+        non_zero_cols= np.array([i  for i,M_col_i in enumerate(list(Img_M.transpose())) if not(is_all_zero_mat(M_col_i,field)) ])
     Img_M=Img_M[:,non_zero_cols]
     #basis of Im(M)\cap K
     Img_inter=intersection(Img_M,K,field)
@@ -363,7 +387,7 @@ def inverse_image(M,K,field):
     return np.concatenate((x, ker),axis=1)
     
 #solve Mx=y
-def inverse_image_vect(M,y,field):
+def inverse_image_vect(M:np.ndarray,y:np.ndarray,field:Field)->np.ndarray:
     assert(M.shape[0]==y.shape[0])
     #empty matrix
     if M.shape[1]*M.shape[0]==0:
@@ -392,7 +416,7 @@ def inverse_image_vect(M,y,field):
     return x
 
 #finds a nonzero solution to Mx=y
-def inverse_image_vect_from_ech(M_ech,pivots,y,field):
+def inverse_image_vect_from_ech(M_ech:np.ndarray,pivots:list,y:np.ndarray,field:Field)->np.ndarray:
     pivots=np.intersect1d(np.array(pivots), np.array(range(M_ech.shape[1])))
     assert(M_ech.shape[0]==y.shape[0])
     #empty matrix
@@ -410,7 +434,10 @@ def inverse_image_vect_from_ech(M_ech,pivots,y,field):
     return x
 
 
-def spanning_subrep(V,x,Vx):
+def spanning_subrep(V:Quiver,x,Vx:np.ndarray)->Dict[Any, np.ndarray]:
+    """
+    Computes bases of the sub-spaces of <V_x> c V
+    """
     Wx=dict(zip(V.vertices, [V.field.to_Field(np.zeros((V.spaces[v], 0),dtype="i")) for v in V.vertices]))
     Wx[x]=Vx
     pile=[x]
@@ -427,7 +454,10 @@ def spanning_subrep(V,x,Vx):
     return Wx
     
 
-def bases_change(V,P):
+def bases_change(V:Quiver,P:Dict[Any, np.ndarray])->Quiver:
+    """
+    Change the bases of the vector spaces of V according to P and return the resulting quiver
+    """
     assert(V.vertices==list(P.keys()))
     We={}
     for e in V.edges.keys():
@@ -437,25 +467,15 @@ def bases_change(V,P):
         
 
 
-def test_subrep_quotient_rep(field_descr):
+def test_subrep_quotient_rep(field_descr:str)->None:
     field=Field(field_descr)
     V1,_= int_module_in_grid_quiver([5,4], [1,1], [3,2],field)
     V2,_= int_module_in_grid_quiver([5,4], [0,1], [3,3],field)
-    
-    
     V=direct_sum(V1, V2)
-    
-    
     V.display_graph(label="V")
-
-    
     Wx=spanning_subrep(V, (1,1), np.array([[field.one],[field.one]]))
-    
-    
-    
     W= subrep(V, Wx)
     W.display_graph(label="W")
-    
     WT= quotientrep(V, Wx)
     WT.display_graph(label="V/W")
 
@@ -466,13 +486,14 @@ print(type(complete_basis(Wx, field)[0][0]))
 '''
 
 
-def print_frac_2darray(A):
+def print_frac_2darray(A:np.ndarray)->None:
+    """Print a 2d array of fractions as floats with 2 decimals"""
     for x in range(A.shape[0]):
         for y in range(A.shape[1]):
             print(np.round(float(A[x][y]),2),end="\t")
         print()
         
-def compute_quotient_slopes(HN,x_set, vertices):
+def compute_quotient_slopes(HN,x_set:List, vertices:List):
     for x in x_set:
         for i in range (1,len(HN[x])):
             ind_x= vertices.index(x)
@@ -480,7 +501,8 @@ def compute_quotient_slopes(HN,x_set, vertices):
             d_tot= sum( [HN[x][i][y]-HN[x][i-1][y] for y in range (len(HN[x][0]))])
             print(Fraction(int(d_x),int(d_tot)))
 
-def print_grid_HN_type(HN,xmax,x_set):
+def print_grid_HN_type(HN,xmax,x_set:List)->None:
+    """ Print a skyscraper invariant in a grid form """
     for x in x_set:
         print("x=",x)
         for (k,dim_vect) in enumerate(HN[x]):    

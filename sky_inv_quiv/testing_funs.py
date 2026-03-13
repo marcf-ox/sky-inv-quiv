@@ -1,12 +1,28 @@
-from sky_inv_quiv.Field import Field, is_all_zero_mat
+
 import numpy as np
 from time import time
 import copy
+import scipy.linalg # type: ignore
+from typing import List, Dict, Any, Optional, Union, Protocol
+
+from sky_inv_quiv.Quiver import Quiver
+from sky_inv_quiv.Field import Field, is_all_zero_mat
 import sky_inv_quiv.auxHN as aux
 from sky_inv_quiv.mainHN import computeHN
-import scipy.linalg
 
 epsilon=1e-10
+
+
+class ComputeHNLike(Protocol):
+    def __call__(
+        self,
+        V: Quiver,
+        *,
+        x_set: Optional[List[Any]] = None,
+        filtration: bool = False,
+        verbose: bool = False,
+    ) -> Dict[Any, List[np.ndarray]]:
+        ...
 
 
 def random_change_bases(V):
@@ -23,17 +39,17 @@ def random_change_bases(V):
             P[x]=V.field.to_Field(p)
     return aux.bases_change(V,P)
     
-def test_skyscraper(grid_size,n_int,verbose=False,field=Field("Q") ):
-    
+def test_skyscraper(grid_size,n_int:int,verbose:bool=False,field:Field=Field("Q"), 
+fun_to_test:ComputeHNLike=computeHN)->bool:  
     V,_=aux.int_module_in_grid_quiver(grid_size, [(1,1)], [(0,0)],field)
     list_V=[]
-    if n_int>2:
+    if n_int>2 and min(grid_size)>2:
         V=aux.grid_indec(grid_size,field)
         n_int-=2
         list_V=[copy.deepcopy(V)]
     
     for k in range(n_int):
-        s=np.random.randint(np.zeros(len(grid_size)),1#(2*np.array(grid_size))//4
+        s=np.random.randint(np.zeros(len(grid_size), dtype=int),1#(2*np.array(grid_size))//4
                             ,2)
         t0=np.random.randint(s,np.array(grid_size),2)
         t1=np.random.randint(s,np.array(grid_size),2)
@@ -48,11 +64,11 @@ def test_skyscraper(grid_size,n_int,verbose=False,field=Field("Q") ):
     W=random_change_bases(V)
 
     #W.display_graph("W")
-    x_set=False
+    x_set: Optional[List[Any]] = None
     #x_set=[(0,0)]
     #np.random.seed(2)
     HN1= compute_HN_from_support(list_V,x_set=x_set)
-    HN2=computeHN(W,x_set=x_set   ,verbose=verbose)
+    HN2=fun_to_test(W, x_set=x_set, filtration=False, verbose=verbose)
     #HN2bis= computeHN(W,x_set=x_set   ,verbose=False)
     
 
@@ -69,6 +85,9 @@ def test_skyscraper(grid_size,n_int,verbose=False,field=Field("Q") ):
             print(HN1[x0])
             print("computing from HN:")
             print(HN2[x0])
+            W.display_graph("W", verbose=True)
+            from time import sleep
+            sleep(10)
             #print(len(HN1[x0])==len(HN2[x0]),[aux.is_all_zero_mat(HN1[x0][i]-HN2[x0][i],V.field) for i in range(len(HN1[x0]))])
             raise ValueError("i")
             success=False
@@ -157,8 +176,6 @@ def test2 (n=4, field = Field("Q")):
   V=aux.direct_sum(aux.direct_sum(V1, V2), V3)
   #V.display_graph("V before change of basis")
   V=random_change_bases(V)
-
-
 
   HN1= compute_HN_from_support( [ V1,V2,V3],False)
   HN2=computeHN(V)

@@ -1,24 +1,29 @@
 # -*- coding: utf-8 -*-
 import numpy as np
-import scipy as scipy
-from sky_inv_quiv.auxHN import extract_basis, intersection, spanning_subrep,subrep,ceil_div,quotientrep
-import sky_inv_quiv.HNcshrunk as cshrunk
+import scipy as scipy #type: ignore
+
 from time import time,sleep
 import copy
 from cfractions import Fraction
+from typing import List, Dict, Any, Optional
+from collections.abc import Callable
 epsilon=1e-10
 import warnings
 import traceback
 import matplotlib.pyplot as plt
+
+from sky_inv_quiv.auxHN import extract_basis, intersection, spanning_subrep,subrep,ceil_div,quotientrep
+import sky_inv_quiv.HNcshrunk as cshrunk
 from sky_inv_quiv.Field import Field,flatten_zero,is_all_zero_mat
 from sky_inv_quiv.Quiver import Quiver
+
 warnings.simplefilter("error")
 
 
 
 x_glob=(0,0)
 
-def computeHN_sub(V,x,filtration=False,verbose=False):    # assumes V=<V_x> 
+def computeHN_sub(V:Quiver,x,filtration=False,verbose=False)->List[np.ndarray]:    # assumes V=<V_x> 
     d=1
     field=V.field
 
@@ -129,8 +134,8 @@ def computeHN_sub(V,x,filtration=False,verbose=False):    # assumes V=<V_x>
 
     #print(intersection(Ublock,U,V.field).shape[1]==U.shape[1])
 
-
-    U0=flatten_zero(U0, field)
+    if not U0 is None:  
+        U0=flatten_zero(U0, field)
     if v_x>3 and v_x_small>1:#verbose:
         pass
         #print("U0=")
@@ -161,8 +166,14 @@ def computeHN_sub(V,x,filtration=False,verbose=False):    # assumes V=<V_x>
                 raise
     return l
     
-def computeHN(V:Quiver,x_set=False,filtration=False,verbose=False): 
-    if x_set==False:
+def computeHN(V:Quiver,x_set:Optional[List]=None,filtration:bool=False,verbose:bool=False,
+comp_HN_sub : Callable[[Quiver, Any, bool, bool], List[np.ndarray]]=computeHN_sub)->Dict[Any,List[np.ndarray]]: 
+    """
+    Compute the skyscraper invariant of V,
+    retricted to x_set (vertices of V by default)
+    using comp_HN_sub to compute HN(<V_x>) for each x in x_set.
+    """
+    if not(x_set):
         x_set=V.vertices
     skyscraper={}
     for x in x_set:
@@ -172,7 +183,7 @@ def computeHN(V:Quiver,x_set=False,filtration=False,verbose=False):
             span_maps= spanning_subrep(V, x,  V.field.to_Field(np.eye(V.spaces[x])))
             span_subrep= subrep(V,span_maps)
             try:
-                l=computeHN_sub(span_subrep,x,filtration,verbose)
+                l=comp_HN_sub(span_subrep,x,filtration,verbose)
             except ValueError as e:
                 #V.display_graph("V2")
                 #span_subrep.display_graph("U2")
@@ -187,7 +198,7 @@ def computeHN(V:Quiver,x_set=False,filtration=False,verbose=False):
 
 
 
-def build_spanning_maps(V,x):
+def build_spanning_maps(V,x)->Dict[Any,np.ndarray]:
     field=V.field
     maps_span={x: V.field.to_Field(np.eye(V.spaces[x]))}
     file=[x]
