@@ -1,48 +1,121 @@
 # compare the output and times of the naive and advanced algorithms on the same quiver files, for both fields Q and F_2
-import argparse
 import numpy as np
-from datetime import datetime
+from concurrent.futures import ProcessPoolExecutor, TimeoutError
 from sky_inv_quiv import computeHN
 from sky_inv_quiv import Field
 from sky_inv_quiv.naive_code import naive_sub_HN
 from sky_inv_quiv.quiver_parser import parse_quiver_file
-from time import time  
-from numpy import array
+from sky_inv_quiv.Quiver import Quiver
+from typing import Tuple, List, Optional, Any, Dict
+from time import perf_counter 
 
-timeout = 600 # timeout for each algorithm
-#open a result file
-report_path = f"comparison_naive_advanced.txt"
-f = open(report_path, "w")
 
-#input script python cheng_alg input_file.txt field
-for field in ["Q", "F_2"]:
-    for dim in range(2,5):
-        for grid_size in range(2,5):
-            input_file = f"sky-inv-quiv/notebook/torus_dim{dim}_1_{grid_size}x{grid_size}.txt"
+def quiver_to_payload(Q: Quiver) -> Dict[str, Any]:
+    return {
+        "vertices": Q.vertices,
+        "edges": Q.edges,
+        "Ve": Q.Ve,
+        "field_descr": Q.field.descr,
+        "grid": Q.grid,
+    }
 
-            #parse the quiver file
-            Q = parse_quiver_file(input_file,field = Field(field),grid_flag=True)
-            try:
-                t0 = time()
-                HN_naive = computeHN(Q, comp_HN_sub=naive_sub_HN)
-                t1 = time()
-                HN_adv = computeHN(Q)
-                t2=time()
-            except:
-                print(field, dim, grid_size, "error during computation")
-                raise
-            # compare HN_naive and HN_adv
-            success=True
-            for x in Q.vertices:
-                success &= (len(HN_adv[x]) == len(HN_naive[x]))
-                for i in range(len(HN_adv[x])):
-                    success &= np.array_equal(HN_adv[x][i], HN_naive[x][i])
-            f.write(
-                f"Field: {field}, dim: {dim}, "
-                f"grid_size: {grid_size}x{grid_size}, success: {success}, "
-                f"time_naive: {(t1 - t0) * 1000:.2f}ms, time_adv: {(t2 - t1) * 1000:.2f}ms\n"
-            )
-            if t1-t0>timeout or t2-t1>timeout:
+
+def run_hn(payload: Dict[str, Any], use_naive: bool) -> Tuple[Dict[Any, List[np.ndarray]], Optional[float]]:
+    Q = Quiver(
+        vertices=payload["vertices"],
+        edges=payload["edges"],
+        Ve=payload["Ve"],
+        field=Field(payload["field_descr"]),
+        grid=payload["grid"],
+    )
+    n_runs = 5
+    t0 = perf_counter()
+    for _ in range(n_runs):
+        if use_naive:
+            HN = computeHN(Q, comp_HN_sub=naive_sub_HN)
+        else:
+            HN = computeHN(Q)
+    t1 = perf_counter()
+    return HN, (t1 - t0) / n_runs
+if __name__ == "__main__":
+
+    timeout = 600   # timeout for each algorithm
+    #open a result file
+    report_path = f"comparison_naive_advanced.txt"
+    f = open(report_path, "w")
+
+    #
+    for field in [ Field("Q"), Field("F_2")]:
+        max_grid_size_naive = 5
+        max_grid_size_advanced = 5
+        for dim in range(2,5):
+            naive_compute=(max_grid_size_naive > 2)
+            if max_grid_size_advanced == 2:
                 break
-                print(f"Field: {field}, dim: {dim}, grid_size: {grid_size}")
-f.close()
+            for grid_size in range(2,5):
+                input_file = f"sky-inv-quiv/notebook/torus_dim{dim}_1_{grid_size}x{grid_size}.txt"
+
+                # parse once, then send pickle-safe payload to workers
+                Q = parse_quiver_file(input_file, field=field, grid_flag=True)
+                payload = quiver_to_payload(Q)
+                executor = ProcessPoolExecutor(max_workers=2)
+                future_naive = executor.submit(run_hn, payload, True)
+                future_adv = executor.submit(run_hn, payload, False)
+
+                timeout_hit_naive = not(naive_compute)
+                timeout_hit_adv = False
+                if naive_compute:
+                    try:
+                        HN_naive, time_naive = future_naive.result(timeout=timeout)
+                    except TimeoutError:
+                        timeout_hit_naive = True
+                        time_naive = None
+                    except Exception:
+                        print(field.descr, dim, grid_size, "error during naive computation")
+                        executor.shutdown(wait=False, cancel_futures=True)
+                        f.close()
+                        raise
+
+                try:
+                    HN_adv, time_adv = future_adv.result(timeout=timeout)
+                except TimeoutError:
+                    timeout_hit_adv = True
+                    time_adv = None
+                except Exception:
+                    print(field.descr, dim, grid_size, "error during advanced computation")
+                    executor.shutdown(wait=False, cancel_futures=True)
+                    f.close()
+                    raise
+
+                executor.shutdown(wait=False, cancel_futures=True)
+
+                if timeout_hit_naive or timeout_hit_adv:
+                    f.write(
+                        f"Field: {field.descr}, dim: {dim}, "
+                        f"grid_size: {grid_size}x{grid_size}, timeout: True, "
+                        f"time_naive: {'timeout' if time_naive is None else f'{time_naive * 1000:.2f}ms'}, "
+                        f"time_adv: {'timeout' if time_adv is None else f'{time_adv * 1000:.2f}ms'}\n"
+                    )
+                    print(f"Field: {field.descr}, dim: {dim}, grid_size: {grid_size},  timeout { 'advanced' if timeout_hit_adv else 'naive' }")
+                    if timeout_hit_naive:
+                        max_grid_size_naive = grid_size
+                        naive_compute=False
+                    if timeout_hit_adv:
+                        max_grid_size_advanced = grid_size
+                        break
+
+                else:
+                    # compare HN_naive and HN_adv
+                    success=True
+                    for x in payload["vertices"]:
+                        success &= (len(HN_adv[x]) == len(HN_naive[x]))
+                        for i in range(len(HN_adv[x])):
+                            success &= np.array_equal(HN_adv[x][i], HN_naive[x][i])
+                    f.write(
+                        f"Field: {field.descr}, dim: {dim}, "
+                        f"grid_size: {grid_size}x{grid_size}, success: {success}, "
+                        f"time_naive: {'timeout' if time_naive is None else f'{time_naive * 1000:.2f}ms'}, "
+                        f"time_adv: {'timeout' if time_adv is None else f'{time_adv * 1000:.2f}ms'}\n"
+                    )
+    f.close()
+    print("program finished")
